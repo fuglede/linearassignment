@@ -1,0 +1,14 @@
+language: csharp
+dist: xenial
+mono: none
+dotnet: 2.2 
+
+before_install:
+ - cd src
+
+install:
+ - dotnet restore
+
+script:
+ - dotnet build
+ - dotnet test
