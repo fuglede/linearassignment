@@ -1,12 +1,12 @@
 # Linear assignment problem in .NET
 [![Build status](https://travis-ci.org/fuglede/linearassignment.svg?branch=master)](https://travis-ci.org/fuglede/linearassignment)
 
-This repository includes a pure C# solver for the rectangular [linear assignment problem](https://en.wikipedia.org/wiki/Assignment_problem), also known as the minimum weight full matching for bipartite graphs.
+This repository includes a pure C# solver for the rectangular [linear assignment problem](https://en.wikipedia.org/wiki/Assignment_problem), also known as the minimum weight full matching problem for bipartite graphs.
 
 
 ## The problem
 
-Concretely, the problem we solve is the following: Let *G* = (*V*, *E*) be a graph and assume that *V* is the disjoint union of two sets *X* and *Y*, with |*X*| ≤ |*Y*|, and so that for every (*i*, *j*) ∈ *E* we have *i* ∈ *X*, *j* ∈ *Y*. A full matching *M* ⊆ *E* is a subset of edges with the property that every vertex in *X* belongs to at most one edge in *M*, and every vertex in *Y* belongs to exactly one edge in *M*. Let *c* : *E* → **R** be any real function. Our goal is to find a full matching *M* minimizing Σ<sub>*e* ∈ *M*</sub> *c*(*e*).
+Concretely, the problem we solve is the following: Let *G* = (*V*, *E*) be a graph and assume that *V* is the disjoint union of two sets *X* and *Y*, with |*X*| ≤ |*Y*|, and so that for every (*i*, *j*) ∈ *E* we have *i* ∈ *X*, *j* ∈ *Y*. A full matching *M* ⊆ *E* is a subset of edges with the property that every vertex in *X* belongs to exactly one edge in *M*, and every vertex in *Y* belongs to at most one edge in *M*. Let *c* : *E* → **R** be any real function. Our goal is to find a full matching *M* minimizing Σ<sub>*e* ∈ *M*</sub> *c*(*e*).
 
 
 ## Method
