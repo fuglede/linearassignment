@@ -4,7 +4,7 @@ using Xunit;
 
 namespace LinearAssignment.Tests
 {
-    public class JonkerVolgenantTest
+    public class SolverTest
     {
         [Theory]
         [MemberData(nameof(TestData))]
@@ -15,7 +15,7 @@ namespace LinearAssignment.Tests
             double[] expectedDualU,
             double[] expectedDualV)
         {
-            var solution = JonkerVolgenant.Solve(cost);
+            var solution = Solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
             Assert.Equal(expectedDualU, solution.DualU);
@@ -86,21 +86,21 @@ namespace LinearAssignment.Tests
         public void SolveThrowsOnInputWithMoreRowsThanColumns()
         {
             var cost = new[,] {{1d},{2d}};
-            Assert.Throws<ArgumentException>(() => JonkerVolgenant.Solve(cost));
+            Assert.Throws<ArgumentException>(() => Solver.Solve(cost));
         }
 
         [Fact]
         public void SolveThrowsOnNegativeInput()
         {
             var cost = new[,] {{-1d}};
-            Assert.Throws<ArgumentException>(() => JonkerVolgenant.Solve(cost));
+            Assert.Throws<ArgumentException>(() => Solver.Solve(cost));
         }
 
         [Fact]
         public void SolveThrowsWhenNoFeasibleSolutionExists()
         {
             var cost = new[,] {{double.PositiveInfinity}};
-            Assert.Throws<InvalidOperationException>(() => JonkerVolgenant.Solve(cost));
+            Assert.Throws<InvalidOperationException>(() => Solver.Solve(cost));
         }
     }
 }

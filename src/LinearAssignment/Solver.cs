@@ -4,24 +4,24 @@ using System.Linq;
 namespace LinearAssignment
 {
     /// <summary>
-    /// Solver for the linear assignment problem based on the Jonker--Volgenant algorithm:
-    /// 
-    ///     R. Jonker and A. Volgenant. A Shortest Augmenting Path Algorithm for
-    ///     Dense and Sparse Linear Assignment Problems. *Computing*, 38:325-340
-    ///     December 1987.
-    ///
-    /// This particular implementation is based on a simplified version of the algorithm
-    /// described in
+    /// Solver for the linear assignment problem based on shortest augmenting paths. Concretely,
+    /// we implement the pseudo-code from
     /// 
     ///     DF Crouse. On implementing 2D rectangular assignment algorithms.
     ///     IEEE Transactions on Aerospace and Electronic Systems
     ///     52(4):1679-1696, August 2016
     ///     doi: 10.1109/TAES.2016.140952
     ///
-    /// Concretely, this is a C# port of the C++ implementation of the algorithm by Peter
-    /// Mahler Larsen included in the Python library scipy.optimize.
+    /// which in turn is based closely on Section 14.4 of
+    ///
+    ///     Rainer Burkard, Mauro Dell'Amico, Silvano Martello.
+    ///     Assignment Problems - Revised Reprint
+    ///     Society for Industrial and Applied Mathematics, Philadelphia, 2012
+    ///
+    /// This is a C# port of the C++ implementation of the algorithm by Peter Mahler Larsen included
+    /// in the Python library scipy.optimize. https://github.com/scipy/scipy/pull/10296/
     /// </summary>
-    public static class JonkerVolgenant
+    public static class Solver
     {
         public static Assignment Solve(double[,] cost, bool skipPositivityTest = false)
         {
@@ -94,13 +94,14 @@ namespace LinearAssignment
 
                     minVal = lowest;
                     var jp = remaining[indexLowest];
-                    sc[jp] = true;
                     if (double.IsPositiveInfinity(minVal))
                         throw new InvalidOperationException("No feasible solution.");
                     if (y[jp] == -1)
                         sink = jp;
                     else
                         i = y[jp];
+
+                    sc[jp] = true;
                     remaining[indexLowest] = remaining[--numRemaining];
                     remaining.RemoveAt(numRemaining);
                 }
