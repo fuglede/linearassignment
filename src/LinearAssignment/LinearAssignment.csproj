@@ -1,7 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>LinearAssignment</PackageId>
+    <Title>Linear assignment problem solver</Title>
+    <Description>C#-only solver for the rectangular linear assignment problem, also known as the minimum weight full matching for bipartite graphs, based on the Jonker--Volgenant algorithm.</Description>
+    <Version>1.0.2</Version>
+    <Authors>fuglede</Authors>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <PackageTags>math;optimization;graph-theory;computer-science;algorithm;combinatorics;matching;operations-research;solver</PackageTags>
+    <RepositoryUrl>https://github.com/fuglede/linearassignment</RepositoryUrl>
   </PropertyGroup>
-
 </Project>
