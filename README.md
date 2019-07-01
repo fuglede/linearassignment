@@ -1,4 +1,5 @@
 # Linear assignment problem solver in .NET
+[![Build status](https://travis-ci.org/fuglede/linearassignment.svg?branch=master)](https://travis-ci.org/fuglede/linearassignment)
 
 This repository includes a pure C# solver for the rectangular [linear assignment problem](https://en.wikipedia.org/wiki/Assignment_problem), also known as the [minimum weight full matching](https://en.wikipedia.org/wiki/Maximum_weight_matching) for [bipartite graphs](https://en.wikipedia.org/wiki/Bipartite_graph).
 
