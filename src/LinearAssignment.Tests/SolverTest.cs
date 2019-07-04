@@ -112,20 +112,6 @@ namespace LinearAssignment.Tests
         };
 
         [Fact]
-        public void SolveThrowsOnInputWithMoreRowsThanColumns()
-        {
-            var cost = new[,] {{1d},{2d}};
-            Assert.Throws<ArgumentException>(() => Solver.Solve(cost));
-        }
-
-        [Fact]
-        public void SolveThrowsOnNegativeInput()
-        {
-            var cost = new[,] {{-1d}};
-            Assert.Throws<ArgumentException>(() => Solver.Solve(cost));
-        }
-
-        [Fact]
         public void SolveThrowsWhenNoFeasibleSolutionExists()
         {
             var cost = new[,] {{double.PositiveInfinity}};
