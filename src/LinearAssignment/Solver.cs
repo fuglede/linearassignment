@@ -35,12 +35,22 @@ namespace LinearAssignment
             if (nr > nc)
                 throw new ArgumentException("Cost can not have more rows than columns.");
 
-            // TODO: Allow negative costs by shifting all values
+            // Ensure that all values are positive as this is required by our search method
+            var min = double.PositiveInfinity;
             if (!skipPositivityTest)
-                for (int i = 0; i < nr; i++)
-                    for (int j = 0; j < nc; j++)
-                        if (cost[i, j] < 0)
-                            throw new ArgumentException("All costs must be non-negative", nameof(cost));
+            {
+                for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        if (cost[i, j] < min)
+                            min = cost[i, j];
+
+                if (min < 0)
+                    for (var i = 0; i < nr; i++)
+                        for (var j = 0; j < nc; j++)
+                            cost[i, j] -= min;
+                else
+                    min = 0;
+            }
 
             // Initialize working arrays
             var u = new double[nr];
@@ -132,6 +142,10 @@ namespace LinearAssignment
                         break;
                 }
             }
+
+            if (!skipPositivityTest && min != 0)
+                for (var ip = 0; ip < nr; ip++)
+                    u[ip] += min;
 
             return new Assignment(x, y, u, v);
         }

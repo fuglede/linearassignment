@@ -61,6 +61,14 @@ namespace LinearAssignment.Tests
             },
             new object[]
             {
+                new double[,] {{6, 6, 4, 7}, {5, 4, -3, -3}, {5, 3, 0, 6}},
+                new[] {1, 3, 2},
+                new[] {-1, 0, 2, 1},
+                new double[] {6, -3, 2},
+                new double[] {0, 0, -2, 0}
+            },
+            new object[]
+            {
                 new double[,] {{ }, { }},
                 new int[] { },
                 new int[] { },
@@ -78,6 +86,19 @@ namespace LinearAssignment.Tests
                 new[] {0, 2, 1},
                 new[] {0, 2, 1},
                 new double[] {10, 1, 7},
+                new double[] {0, 0, 0}
+            },
+            new object[]
+            {
+                new[,]
+                {
+                    {-10, double.PositiveInfinity, double.PositiveInfinity},
+                    {double.PositiveInfinity, double.PositiveInfinity, -19},
+                    {double.PositiveInfinity, -13, double.PositiveInfinity}
+                },
+                new[] {0, 2, 1},
+                new[] {0, 2, 1},
+                new double[] {-10, -19, -13},
                 new double[] {0, 0, 0}
             }
         };
