@@ -31,9 +31,22 @@ namespace LinearAssignment
                 return new Assignment(new int[] { }, new int[] { },
                     new double[] { }, new double[] { });
 
-            // TODO: Allow matrices with nr > nc by transposing
+            // In our solution, we will assume that nr <= nc. If this isn't the case,
+            // we transpose the entire matrix and make sure to fix up the results at
+            // the end of the day.
+            bool transpose = false;
             if (nr > nc)
-                throw new ArgumentException("Cost can not have more rows than columns.");
+            {
+                var tmp = nc;
+                nc = nr;
+                nr = tmp;
+                var tmpCost = new double[nr, nc];
+                for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        tmpCost[i, j] = cost[j, i];
+                cost = tmpCost;
+                transpose = true;
+            }
 
             // Ensure that all values are positive as this is required by our search method
             var min = double.PositiveInfinity;
@@ -147,7 +160,7 @@ namespace LinearAssignment
                 for (var ip = 0; ip < nr; ip++)
                     u[ip] += min;
 
-            return new Assignment(x, y, u, v);
+            return transpose? new Assignment(y, x, v, u) : new Assignment(x, y, u, v);
         }
     }
 }
