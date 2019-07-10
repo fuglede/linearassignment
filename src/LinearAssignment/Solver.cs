@@ -23,13 +23,26 @@ namespace LinearAssignment
     /// </summary>
     public static class Solver
     {
-        public static Assignment Solve(double[,] cost, bool skipPositivityTest = false)
+        public static Assignment Solve(double[,] cost, bool maximize = false, bool skipPositivityTest = false)
         {
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
             if (nr == 0 || nc == 0)
                 return new Assignment(new int[] { }, new int[] { },
                     new double[] { }, new double[] { });
+
+            // We handle maximization by changing all signs in the given cost, then
+            // minimizing the result. At the end of the day, we also make sure to
+            // update the dual variables accordingly.
+            if (maximize)
+            {
+                var tmpCost = new double[nr, nc];
+                for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        tmpCost[i, j] = -cost[i, j];
+                cost = tmpCost;
+            }
+
 
             // In our solution, we will assume that nr <= nc. If this isn't the case,
             // we transpose the entire matrix and make sure to fix up the results at
@@ -160,7 +173,13 @@ namespace LinearAssignment
                 for (var ip = 0; ip < nr; ip++)
                     u[ip] += min;
 
-            return transpose? new Assignment(y, x, v, u) : new Assignment(x, y, u, v);
+            if (maximize)
+            {
+                for (int i = 0; i < nr; i++) u[i] = -u[i];
+                for (int j = 0; j < nc; j++) v[j] = -v[j];
+            }
+
+            return transpose ? new Assignment(y, x, v, u) : new Assignment(x, y, u, v);
         }
     }
 }
