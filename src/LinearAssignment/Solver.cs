@@ -114,6 +114,11 @@ namespace LinearAssignment
                     for (var jk = 0; jk < numRemaining; jk++)
                     {
                         var jl = remaining[jk];
+                        // Note that this is the main bottleneck of this method; looking up the cost array
+                        // is costly. Some obvious attempts to improve performance include swapping rows and
+                        // columns, and disabling CLR bounds checking by using pointers to access the elements
+                        // instead. We do not seem to get any significant improvements over the simpler
+                        // approach below though.
                         var r = minVal + cost[i, jl] - u[i] - v[jl];
                         if (r < shortestPathCosts[jl])
                         {
