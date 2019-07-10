@@ -47,7 +47,7 @@ namespace LinearAssignment
             // In our solution, we will assume that nr <= nc. If this isn't the case,
             // we transpose the entire matrix and make sure to fix up the results at
             // the end of the day.
-            bool transpose = false;
+            var transpose = false;
             if (nr > nc)
             {
                 var tmp = nc;
@@ -180,8 +180,8 @@ namespace LinearAssignment
 
             if (maximize)
             {
-                for (int i = 0; i < nr; i++) u[i] = -u[i];
-                for (int j = 0; j < nc; j++) v[j] = -v[j];
+                for (var i = 0; i < nr; i++) u[i] = -u[i];
+                for (var j = 0; j < nc; j++) v[j] = -v[j];
             }
 
             return transpose ? new Assignment(y, x, v, u) : new Assignment(x, y, u, v);
