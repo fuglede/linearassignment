@@ -25,9 +25,12 @@ namespace LinearAssignment
     /// Note that no attempt is made to detect whether feasible solutions exist. As such,
     /// the solver may run forever if no feasible solutions exist.
     /// </summary>
-    public class Pseudoflow
+    public class Pseudoflow : ISolver
     {
-        public static Assignment Solve(int[,] cost)
+        public Assignment Solve(double[,] cost) =>
+            throw new NotImplementedException("The pseudoflow solver can only be used with integer costs");
+
+        public Assignment Solve(int[,] cost)
         {
             // TODO: Allow maximization
             // TODO: Allow rectangular inputs
@@ -207,5 +210,11 @@ namespace LinearAssignment
             }
             return false;
         }
+    }
+
+    public interface ISolver
+    {
+        Assignment Solve(double[,] cost);
+        Assignment Solve(int[,] cost);
     }
 }

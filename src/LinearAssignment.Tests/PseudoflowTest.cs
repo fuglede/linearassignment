@@ -13,7 +13,8 @@ namespace LinearAssignment.Tests
             int[] expectedColumnAssignment,
             int[] expectedRowAssignment)
         {
-            var solution = Pseudoflow.Solve(cost);
+            var solver = new Pseudoflow();
+            var solution = solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
         }
@@ -80,7 +81,8 @@ namespace LinearAssignment.Tests
         public void SolveThrowsWhenNoFeasibleSolutionExists()
         {
             var cost = new[,] { { int.MaxValue } };
-            Assert.Throws<InvalidOperationException>(() => Pseudoflow.Solve(cost));
+            var solver = new Pseudoflow();
+            Assert.Throws<InvalidOperationException>(() => solver.Solve(cost));
         }
     }
 }

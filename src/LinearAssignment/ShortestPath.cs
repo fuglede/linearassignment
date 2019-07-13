@@ -21,9 +21,18 @@ namespace LinearAssignment
     /// This is a C# port of the C++ implementation of the algorithm by Peter Mahler Larsen included
     /// in the Python library scipy.optimize. https://github.com/scipy/scipy/pull/10296/
     /// </summary>
-    public static class ShortestPath
+    public class ShortestPath : ISolver
     {
-        public static Assignment Solve(double[,] cost, bool maximize = false, bool skipPositivityTest = false)
+        private readonly bool _maximize;
+        private readonly bool _skipPositivityTest;
+
+        public ShortestPath(bool maximize = false, bool skipPositivityTest = false)
+        {
+            _maximize = maximize;
+            _skipPositivityTest = skipPositivityTest;
+        }
+
+        public Assignment Solve(double[,] cost)
         {
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
@@ -34,7 +43,7 @@ namespace LinearAssignment
             // We handle maximization by changing all signs in the given cost, then
             // minimizing the result. At the end of the day, we also make sure to
             // update the dual variables accordingly.
-            if (maximize)
+            if (_maximize)
             {
                 var tmpCost = new double[nr, nc];
                 for (var i = 0; i < nr; i++)
@@ -63,7 +72,7 @@ namespace LinearAssignment
 
             // Ensure that all values are positive as this is required by our search method
             var min = double.PositiveInfinity;
-            if (!skipPositivityTest)
+            if (!_skipPositivityTest)
             {
                 for (var i = 0; i < nr; i++)
                     for (var j = 0; j < nc; j++)
@@ -174,17 +183,34 @@ namespace LinearAssignment
                 }
             }
 
-            if (!skipPositivityTest && min != 0)
+            if (!_skipPositivityTest && min != 0)
                 for (var ip = 0; ip < nr; ip++)
                     u[ip] += min;
 
-            if (maximize)
+            if (_maximize)
             {
                 for (var i = 0; i < nr; i++) u[i] = -u[i];
                 for (var j = 0; j < nc; j++) v[j] = -v[j];
             }
 
             return transpose ? new Assignment(y, x, v, u) : new Assignment(x, y, u, v);
+        }
+
+        public Assignment Solve(int[,] cost)
+        {
+            // Note that it would be possible to reimplement the above method using only
+            // integer arithmetic. Doing so does provide a very slight performance improvement
+            // but there's no nice way of implementing the method for ints and doubles at once
+            // without duplicating code or moving to something like T4 templates. This would
+            // work but would also increase the maintenance load, so for now we just keep this
+            // simple and use the floating-point version directly.
+            var nr = cost.GetLength(0);
+            var nc = cost.GetLength(1);
+            var doubleCost = new double[nr, nc];
+            for (int i = 0; i < nr; i++)
+                for (int j = 0; j < nc; j++)
+                    doubleCost[i, j] = cost[i, j];
+            return Solve(doubleCost);
         }
     }
 }

@@ -15,7 +15,8 @@ namespace LinearAssignment.Tests
             double[] expectedDualU,
             double[] expectedDualV)
         {
-            var solution = ShortestPath.Solve(cost);
+            var solver = new ShortestPath();
+            var solution = solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
             Assert.Equal(expectedDualU, solution.DualU);
@@ -134,7 +135,8 @@ namespace LinearAssignment.Tests
             double[] expectedDualU,
             double[] expectedDualV)
         {
-            var solution = ShortestPath.Solve(cost, true);
+            var solver = new ShortestPath(maximize: true);
+            var solution = solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
             Assert.Equal(expectedDualU, solution.DualU);
@@ -244,7 +246,8 @@ namespace LinearAssignment.Tests
         public void SolveThrowsWhenNoFeasibleSolutionExists()
         {
             var cost = new[,] {{double.PositiveInfinity}};
-            Assert.Throws<InvalidOperationException>(() => ShortestPath.Solve(cost));
+            var solver = new ShortestPath();
+            Assert.Throws<InvalidOperationException>(() => solver.Solve(cost));
         }
     }
 }
