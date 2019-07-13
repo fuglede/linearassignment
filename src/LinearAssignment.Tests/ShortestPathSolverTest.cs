@@ -4,7 +4,7 @@ using Xunit;
 
 namespace LinearAssignment.Tests
 {
-    public class ShortestPathTest
+    public class ShortestPathSolverTest
     {
         [Theory]
         [MemberData(nameof(TestDataMinimize))]
@@ -15,7 +15,7 @@ namespace LinearAssignment.Tests
             double[] expectedDualU,
             double[] expectedDualV)
         {
-            var solver = new ShortestPath();
+            var solver = new ShortestPathSolver();
             var solution = solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
@@ -135,7 +135,7 @@ namespace LinearAssignment.Tests
             double[] expectedDualU,
             double[] expectedDualV)
         {
-            var solver = new ShortestPath(maximize: true);
+            var solver = new ShortestPathSolver(maximize: true);
             var solution = solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
@@ -246,7 +246,7 @@ namespace LinearAssignment.Tests
         public void SolveThrowsWhenNoFeasibleSolutionExists()
         {
             var cost = new[,] {{double.PositiveInfinity}};
-            var solver = new ShortestPath();
+            var solver = new ShortestPathSolver();
             Assert.Throws<InvalidOperationException>(() => solver.Solve(cost));
         }
     }

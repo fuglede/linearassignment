@@ -21,12 +21,12 @@ namespace LinearAssignment
     /// This is a C# port of the C++ implementation of the algorithm by Peter Mahler Larsen included
     /// in the Python library scipy.optimize. https://github.com/scipy/scipy/pull/10296/
     /// </summary>
-    public class ShortestPath : ISolver
+    public class ShortestPathSolver : ISolver
     {
         private readonly bool _maximize;
         private readonly bool _skipPositivityTest;
 
-        public ShortestPath(bool maximize = false, bool skipPositivityTest = false)
+        public ShortestPathSolver(bool maximize = false, bool skipPositivityTest = false)
         {
             _maximize = maximize;
             _skipPositivityTest = skipPositivityTest;

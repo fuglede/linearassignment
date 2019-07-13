@@ -4,7 +4,7 @@ using Xunit;
 
 namespace LinearAssignment.Tests
 {
-    public class PseudoflowTest
+    public class PseudoflowSolverTest
     {
         [Theory]
         [MemberData(nameof(TestDataMinimize))]
@@ -13,7 +13,7 @@ namespace LinearAssignment.Tests
             int[] expectedColumnAssignment,
             int[] expectedRowAssignment)
         {
-            var solver = new Pseudoflow();
+            var solver = new PseudoflowSolver();
             var solution = solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
@@ -81,7 +81,7 @@ namespace LinearAssignment.Tests
         public void SolveThrowsWhenNoFeasibleSolutionExists()
         {
             var cost = new[,] { { int.MaxValue } };
-            var solver = new Pseudoflow();
+            var solver = new PseudoflowSolver();
             Assert.Throws<InvalidOperationException>(() => solver.Solve(cost));
         }
     }
