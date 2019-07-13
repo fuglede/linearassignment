@@ -101,6 +101,7 @@ namespace LinearAssignment
                 epsilon /= _alpha;
                 for (var i = 0; i < n; i++) col[i] = -1;
                 for (var j = 0; j < n; j++) row[j] = -1;
+                var unassigned = new Stack<int>(Enumerable.Range(1, n - 1).Reverse());
                 var k = 0;
                 for (var i = 0; i < n; i++)
                 {
@@ -114,7 +115,7 @@ namespace LinearAssignment
 
                 while (true)
                 {
-                    if (!DoublePush(col, row, cost, ref k, epsilon, u, v))
+                    if (!DoublePush(col, row, cost, ref k, epsilon, u, v, unassigned))
                         break;
                 }
             }
@@ -160,7 +161,7 @@ namespace LinearAssignment
         }
 
         private static bool DoublePush(
-            int[] col, int[] row, int[,] cost, ref int k, double epsilon, double[] u, double[] v)
+            int[] col, int[] row, int[,] cost, ref int k, double epsilon, double[] u, double[] v, Stack<int> unassigned)
         {
             var n = u.Length;
             var smallest = double.PositiveInfinity;
@@ -193,28 +194,16 @@ namespace LinearAssignment
             {
                 var i = row[j];
                 row[j] = k;
-                if (i == k) throw new InvalidOperationException();
                 v[j] = cost[k, j] - u[k] - epsilon;
                 col[i] = -1;
-                if (i >= k) return FindUnassigned(col, ref k);
                 k = i;
                 return true;
             }
 
             row[j] = k;
-            return FindUnassigned(col, ref k);
-        }
-
-        private static bool FindUnassigned(int[] col, ref int k)
-        {
-            var n = col.Length;
-            for (var i = k + 1; i < n; i++)
-            {
-                if (col[i] != -1) continue;
-                k = i;
-                return true;
-            }
-            return false;
+            if (unassigned.Count == 0) return false;
+            k = unassigned.Pop();
+            return true;
         }
     }
 
