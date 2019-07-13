@@ -27,6 +27,15 @@ namespace LinearAssignment
     /// </summary>
     public class PseudoflowSolver : ISolver
     {
+        private readonly double _alpha;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PseudoflowSolver"/> class.
+        /// </summary>
+        /// <param name="alpha">The cost-scaling reduction factor.</param>
+        public PseudoflowSolver(double alpha = 10) =>
+            _alpha = alpha;
+
         public Assignment Solve(double[,] cost) =>
             throw new NotImplementedException("The pseudoflow solver can only be used with integer costs");
 
@@ -75,9 +84,6 @@ namespace LinearAssignment
                 }
             }
 
-            // Decrease epsilon by a factor of 10 at each step, following Goldberg--Kennedy.
-            var alpha = 10;
-
             // Initialize epsilon to be the largest cost
             var epsilon = double.NegativeInfinity;
             for (var i = 0; i < n; i++)
@@ -92,7 +98,7 @@ namespace LinearAssignment
             var row = new int[n];
             while (epsilon >= 1d / n)
             {
-                epsilon /= alpha;
+                epsilon /= _alpha;
                 for (var i = 0; i < n; i++) col[i] = -1;
                 for (var j = 0; j < n; j++) row[j] = -1;
                 var k = 0;
