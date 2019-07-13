@@ -1,5 +1,4 @@
-﻿using LinearAssignment;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -96,6 +95,19 @@ namespace LinearAssignment.Tests
                 new[] {0, 2, 1},
                 new double[] {10, 1, 7},
                 new double[] {0, 0, 0}
+            },
+            new object[]
+            {
+                new[,]
+                {
+                    {double.PositiveInfinity, 11, double.PositiveInfinity},
+                    {11, 1, 10},
+                    {double.PositiveInfinity, 7, 12}
+                },
+                new[] {1, 0, 2},
+                new[] {1, 0, 2},
+                new double[] {21, 11, 13},
+                new double[] {0, -10, -1}
             },
             new object[]
             {
@@ -198,6 +210,19 @@ namespace LinearAssignment.Tests
                 new[] {0, 2, 1},
                 new[] {0, 2, 1},
                 new double[] {10, 1, 7},
+                new double[] {0, 0, 0}
+            },
+            new object[]
+            {
+                new[,]
+                {
+                    {double.NegativeInfinity, 11, double.NegativeInfinity},
+                    {11, 1, 10},
+                    {double.NegativeInfinity, 7, 12}
+                },
+                new[] {1, 0, 2},
+                new[] {1, 0, 2},
+                new double[] {11, 11, 12},
                 new double[] {0, 0, 0}
             },
             new object[]
