@@ -21,7 +21,7 @@ namespace LinearAssignment
     /// This is a C# port of the C++ implementation of the algorithm by Peter Mahler Larsen included
     /// in the Python library scipy.optimize. https://github.com/scipy/scipy/pull/10296/
     /// </summary>
-    public static class Solver
+    public static class ShortestPath
     {
         public static Assignment Solve(double[,] cost, bool maximize = false, bool skipPositivityTest = false)
         {
