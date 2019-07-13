@@ -206,10 +206,4 @@ namespace LinearAssignment
             return true;
         }
     }
-
-    public interface ISolver
-    {
-        Assignment Solve(double[,] cost);
-        Assignment Solve(int[,] cost);
-    }
 }
