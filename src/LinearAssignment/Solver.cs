@@ -12,7 +12,7 @@ namespace LinearAssignment
     ///     52(4):1679-1696, August 2016
     ///     doi: 10.1109/TAES.2016.140952
     ///
-    /// which in turn is based closely on Section 14.4 of
+    /// which in turn is based closely on Section 4.4 of
     ///
     ///     Rainer Burkard, Mauro Dell'Amico, Silvano Martello.
     ///     Assignment Problems - Revised Reprint
