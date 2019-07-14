@@ -137,12 +137,9 @@ namespace LinearAssignment
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
             if (nr <= nc) return false;
-            var tmp = nc;
-            nc = nr;
-            nr = tmp;
-            var tmpCost = new T[nr, nc];
-            for (var i = 0; i < nr; i++)
-            for (var j = 0; j < nc; j++)
+            var tmpCost = new T[nc, nr];
+            for (var i = 0; i < nc; i++)
+            for (var j = 0; j < nr; j++)
                 tmpCost[i, j] = cost[j, i];
             cost = tmpCost;
             return true;
