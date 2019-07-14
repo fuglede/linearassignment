@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 
 namespace LinearAssignment
 {
@@ -10,6 +9,15 @@ namespace LinearAssignment
     /// </summary>
     public class Solver
     {
+        /// <summary>
+        /// Solves an instance of the linear assignment problem with floating point costs.
+        /// </summary>
+        /// <param name="cost">The weights of the edges of the bipartite graph representing
+        /// the problem. Edges can be removed by specifying a weight of <see cref="double.PositiveInfinity"/>
+        /// when minimizing and <see cref="double.NegativeInfinity"/> when maximizing.</param>
+        /// <param name="maximize">Whether or not to maximize total cost rather than minimize it.</param>
+        /// <param name="solver">The solver to use. If not given, this defaults to <see cref="ShortestPathSolver"/>.</param>
+        /// <returns>An <see cref="Assignment"/> representing the solution.</returns>
         public static Assignment Solve(double[,] cost, bool maximize = false, ISolver solver = null)
         {
             var transpose = Transpose(ref cost);
@@ -59,6 +67,15 @@ namespace LinearAssignment
             return solution;
         }
 
+        /// <summary>
+        /// Solves an instance of the linear assignment problem with integral costs.
+        /// </summary>
+        /// <param name="cost">The weights of the edges of the bipartite graph representing
+        /// the problem. Edges can be removed by specifying a weight of <see cref="int.MaxValue"/>
+        /// when minimizing and <see cref="int.MinValue"/> when maximizing.</param>
+        /// <param name="maximize">Whether or not to maximize total cost rather than minimize it.</param>
+        /// <param name="solver">The solver to use. If not given, this defaults to <see cref="PseudoflowSolver"/>.</param>
+        /// <returns>An <see cref="Assignment"/> representing the solution.</returns>
         public static Assignment Solve(int[,] cost, bool maximize = false, ISolver solver = null)
         {
             var transpose = Transpose(ref cost);
