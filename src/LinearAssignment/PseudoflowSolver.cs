@@ -115,8 +115,48 @@ namespace LinearAssignment
 
                 while (true)
                 {
-                    if (!DoublePush(col, row, cost, ref k, epsilon, u, v, unassigned))
-                        break;
+                    // Perform double push
+                    var smallest = double.PositiveInfinity;
+                    var j = -1;
+                    var secondSmallest = double.PositiveInfinity;
+                    var z = -1;
+                    var uk = u[k];
+                    for (var jp = 0; jp < n; jp++)
+                    {
+                        var reducedCost = cost[k, jp] - uk - v[jp];
+                        if (reducedCost <= smallest)
+                        {
+                            secondSmallest = smallest;
+                            smallest = reducedCost;
+                            z = j;
+                            j = jp;
+                        }
+                        else if (reducedCost <= secondSmallest)
+                        {
+                            secondSmallest = reducedCost;
+                            z = jp;
+                        }
+                    }
+
+                    col[k] = j;
+                    // TODO: Detect infeasibility by investigating dual updates.
+                    u[k] = cost[k, z] - v[z];
+
+                    if (row[j] != -1)
+                    {
+                        var i = row[j];
+                        row[j] = k;
+                        v[j] = cost[k, j] - u[k] - epsilon;
+                        col[i] = -1;
+                        k = i;
+                    }
+                    else
+                    {
+                        row[j] = k;
+                        if (unassigned.Count == 0) break;
+                        k = unassigned.Pop();
+                    }
+
                 }
             }
 
@@ -158,52 +198,6 @@ namespace LinearAssignment
             }
 
             return result;
-        }
-
-        private static bool DoublePush(
-            int[] col, int[] row, int[,] cost, ref int k, double epsilon, double[] u, double[] v, Stack<int> unassigned)
-        {
-            var n = u.Length;
-            var smallest = double.PositiveInfinity;
-            var j = -1;
-            var secondSmallest = double.PositiveInfinity;
-            var z = -1;
-            var uk = u[k];
-            for (var jp = 0; jp < n; jp++)
-            {
-                var reducedCost = cost[k, jp] - uk - v[jp];
-                if (reducedCost <= smallest)
-                {
-                    secondSmallest = smallest;
-                    smallest = reducedCost;
-                    z = j;
-                    j = jp;
-                }
-                else if (reducedCost <= secondSmallest)
-                {
-                    secondSmallest = reducedCost;
-                    z = jp;
-                }
-            }
-
-            col[k] = j;
-            // TODO: Detect infeasibility by investigating dual updates.
-            u[k] = cost[k, z] - v[z];
-
-            if (row[j] != -1)
-            {
-                var i = row[j];
-                row[j] = k;
-                v[j] = cost[k, j] - u[k] - epsilon;
-                col[i] = -1;
-                k = i;
-                return true;
-            }
-
-            row[j] = k;
-            if (unassigned.Count == 0) return false;
-            k = unassigned.Pop();
-            return true;
         }
     }
 }
