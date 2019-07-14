@@ -145,17 +145,20 @@ namespace LinearAssignment
                     for (var jp = 0; jp < n; jp++)
                     {
                         var reducedCost = cost[k, jp] - uk - v[jp];
-                        if (reducedCost <= smallest)
+                        if (reducedCost <= secondSmallest)
                         {
-                            secondSmallest = smallest;
-                            smallest = reducedCost;
-                            z = j;
-                            j = jp;
-                        }
-                        else if (reducedCost <= secondSmallest)
-                        {
-                            secondSmallest = reducedCost;
-                            z = jp;
+                            if (reducedCost <= smallest)
+                            {
+                                secondSmallest = smallest;
+                                smallest = reducedCost;
+                                z = j;
+                                j = jp;
+                            }
+                            else
+                            {
+                                secondSmallest = reducedCost;
+                                z = jp;
+                            }
                         }
                     }
 
