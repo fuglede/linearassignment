@@ -7,7 +7,7 @@ namespace LinearAssignment
     /// of defaults for algorithms. This is the intended entry point for general
     /// purpose usage of the library.
     /// </summary>
-    public class Solver
+    public static class Solver
     {
         /// <summary>
         /// Solves an instance of the linear assignment problem with floating point costs.
