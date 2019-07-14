@@ -91,7 +91,10 @@ namespace LinearAssignment
                     if (cost[i, j] > epsilon && cost[i, j] != int.MaxValue)
                         epsilon = cost[i, j];
 
-            // Initialize assignment variable x and the dual variables
+            // Initialize dual variables and assignment variables keeping track of
+            // assignments as we move along: col maps a given row to the column
+            // it's assigned to, and conversely row maps a given column to its
+            // assigned row.
             var u = new double[n];
             var v = new double[n];
             var col = new int[n];
@@ -99,8 +102,12 @@ namespace LinearAssignment
             while (epsilon >= 1d / n)
             {
                 epsilon /= _alpha;
+                // A value in -1 in row and col corresponds to "unassigned"
                 for (var i = 0; i < n; i++) col[i] = -1;
                 for (var j = 0; j < n; j++) row[j] = -1;
+                // We also maintain a stack of rows that have not been assigned. We
+                // could get this information from the variable col, but being able to
+                // just pop the stack to get new unassigned rows is much faster.
                 var unassigned = new Stack<int>(Enumerable.Range(1, n - 1).Reverse());
                 var k = 0;
                 for (var i = 0; i < n; i++)
@@ -115,7 +122,9 @@ namespace LinearAssignment
 
                 while (true)
                 {
-                    // Perform double push
+                    // Perform double push. The halting condition is that all rows
+                    // have been assigned, which corresponds to the stack of unassigned
+                    // rows having been emptied.
                     var smallest = double.PositiveInfinity;
                     var j = -1;
                     var secondSmallest = double.PositiveInfinity;
