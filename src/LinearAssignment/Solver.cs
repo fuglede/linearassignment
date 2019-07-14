@@ -9,6 +9,9 @@ namespace LinearAssignment
     /// </summary>
     public static class Solver
     {
+        // There is an unfortunate amount of code duplication going on between the floating point and
+        // integral cases below. It would be possible to take care of some of this by applying T4 templates
+        // but on the other hand, that doesn't make maintenance much simpler.
         /// <summary>
         /// Solves an instance of the linear assignment problem with floating point costs.
         /// </summary>
