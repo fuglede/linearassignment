@@ -74,7 +74,8 @@ namespace LinearAssignment
         /// the problem. Edges can be removed by specifying a weight of <see cref="int.MaxValue"/>
         /// when minimizing and <see cref="int.MinValue"/> when maximizing.</param>
         /// <param name="maximize">Whether or not to maximize total cost rather than minimize it.</param>
-        /// <param name="solver">The solver to use. If not given, this defaults to <see cref="PseudoflowSolver"/>.</param>
+        /// <param name="solver">The solver to use. If not given, this defaults to <see cref="PseudoflowSolver"/>
+        /// for square costs and <see cref="ShortestPathSolver"/> for rectangular ones.</param>
         /// <returns>An <see cref="Assignment"/> representing the solution.</returns>
         public static Assignment Solve(int[,] cost, bool maximize = false, ISolver solver = null)
         {
