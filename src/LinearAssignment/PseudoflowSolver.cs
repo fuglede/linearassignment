@@ -48,7 +48,6 @@ namespace LinearAssignment
 
         public Assignment Solve(int[,] cost)
         {
-            // TODO: Allow maximization
             // TODO: Allow rectangular inputs
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);

@@ -63,17 +63,6 @@ namespace LinearAssignment.Tests
                 },
                 new[] {1, 0, 2},
                 new[] {1, 0, 2}
-            },
-            new object[]
-            {
-                new[,]
-                {
-                    {-10, int.MaxValue, int.MaxValue},
-                    {int.MaxValue, int.MaxValue, -19},
-                    {int.MaxValue, -13, int.MaxValue}
-                },
-                new[] {0, 2, 1},
-                new[] {0, 2, 1}
             }
         };
 
