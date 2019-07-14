@@ -51,9 +51,6 @@ namespace LinearAssignment
             // TODO: Allow rectangular inputs
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
-            if (nr == 0 || nc == 0)
-                return new Assignment(new int[] { }, new int[] { },
-                    new double[] { }, new double[] { });
             if (nr != nc)
                 throw new NotImplementedException("Pseudoflow is only implemented for square matrices");
             var n = nr;

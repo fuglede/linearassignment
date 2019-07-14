@@ -27,9 +27,6 @@ namespace LinearAssignment
         {
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
-            if (nr == 0 || nc == 0)
-                return new Assignment(new int[] { }, new int[] { },
-                    new double[] { }, new double[] { });
 
             // Initialize working arrays
             var u = new double[nr];

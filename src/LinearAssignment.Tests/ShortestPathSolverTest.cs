@@ -62,14 +62,6 @@ namespace LinearAssignment.Tests
             },
             new object[]
             {
-                new double[,] {{ }, { }},
-                new int[] { },
-                new int[] { },
-                new double[] { },
-                new double[] { }
-            },
-            new object[]
-            {
                 new[,]
                 {
                     {10, double.PositiveInfinity, double.PositiveInfinity},

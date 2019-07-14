@@ -13,11 +13,14 @@ namespace LinearAssignment
         public static Assignment Solve(double[,] cost, bool maximize = false, ISolver solver = null)
         {
             var transpose = Transpose(ref cost);
+            var nr = cost.GetLength(0);
+            var nc = cost.GetLength(1);
+            if (nr == 0 || nc == 0)
+                return new Assignment(new int[] { }, new int[] { },
+                    new double[] { }, new double[] { });
             // We handle maximization by changing all signs in the given cost, then
             // minimizing the result. At the end of the day, we also make sure to
             // update the dual variables accordingly.
-            var nr = cost.GetLength(0);
-            var nc = cost.GetLength(1);
             if (maximize)
             {
                 var tmpCost = new double[nr, nc];
@@ -59,11 +62,14 @@ namespace LinearAssignment
         public static Assignment Solve(int[,] cost, bool maximize = false, ISolver solver = null)
         {
             var transpose = Transpose(ref cost);
+            var nr = cost.GetLength(0);
+            var nc = cost.GetLength(1);
+            if (nr == 0 || nc == 0)
+                return new Assignment(new int[] { }, new int[] { },
+                    new double[] { }, new double[] { });
 
             // As in the double case, maximization is handled by flipping the sign; here, we need
             // to take special care when dealing with "infinities".
-            var nr = cost.GetLength(0);
-            var nc = cost.GetLength(1);
             if (maximize)
             {
                 var tmpCost = new int[nr, nc];
