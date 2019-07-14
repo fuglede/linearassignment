@@ -11,14 +11,14 @@ Concretely, the problem we solve is the following: Let *G* = (*V*, *E*) be a [gr
 
 ## Method
 
-The method we use is based on shortest augmenting paths: At each step of the algorithm, the matching *M* is expanded by using Dijkstra's algorithm to find the shortest augmenting path from a given non-matched element of *X* to a non-matched element of *Y*, and the weights of the graph are updated according to a primal-dual method. We follow the pseudo-code laid out in
+We provide a few different methods for solving the problem. One is based on shortest augmenting paths: At each step of the algorithm, the matching *M* is expanded by using Dijkstra's algorithm to find the shortest augmenting path from a given non-matched element of *X* to a non-matched element of *Y*, and the weights of the graph are updated according to a primal-dual method. We follow the pseudo-code laid out in
 
     DF Crouse. On implementing 2D rectangular assignment algorithms.
     IEEE Transactions on Aerospace and Electronic Systems
     52(4):1679-1696, August 2016
     doi: 10.1109/TAES.2016.140952
 
-which in turn is based closely on Section 14.4 of
+which in turn is based closely on Section 4.4 of
 
     Rainer Burkard, Mauro Dell'Amico, Silvano Martello.
     Assignment Problems - Revised Reprint
@@ -32,7 +32,13 @@ In Crouse's approach, the main reference is
     
 Here, most of the computational time is spent on initialization and setting up a useful solution prior to searching for shortest augmenting paths, where in the method at hand, all initialization is skipped, and we jump straight to augmentation.
 
-Our algorithm is ported from the C++ implementation in [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html).
+Our algorithm for this method is ported from the C++ implementation in [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html).
+
+Another method based on the pseudoflow approach to solving minimum cost flow problems. This is closely based on Section 4.6.4 of Assignment Problems, which in turn is based on the cost-scaling assignment (CSA) approach of
+
+    A.V. Goldberg and R. Kennedy.
+    An efficient cost scaling algorithm for the assignment problem.
+    Math. Program., 71:153–177, 1995
 
 
 ## Installation
@@ -42,7 +48,7 @@ The package is available from the public [NuGet Gallery](https://www.nuget.org/p
 
 ## Example
 
-With the notation above, assume that *X* consists of 3 vertices, and that *Y* consists of 4 vertices. Then the function *c* may be described by some `double[3, 4]`, each of whose elements is a pair (*i*, *j*) of elements of *X* and *Y* respectively, in which we use `double.PositiveInfinity` to indicate that a given pair is not connected by an edge. Let us assume that such a *c* is given, and let us assume that each vertex in *X* have edges incident with each vertex in *Y*, except for, say, the last vertex in *X* not being connected to the last vertex in *Y*. Then the minimum weight matching may be obtained as follows:
+With the notation above, assume that *X* consists of 3 vertices, and that *Y* consists of 4 vertices. Then the function *c* may be described by some `double[3, 4]` (or `int[3, 4]` if all weights are integral), each of whose elements is a pair (*i*, *j*) of elements of *X* and *Y* respectively, in which we use `double.PositiveInfinity` to indicate that a given pair is not connected by an edge. Let us assume that such a *c* is given, and let us assume that each vertex in *X* have edges incident with each vertex in *Y*, except for, say, the last vertex in *X* not being connected to the last vertex in *Y*. Then the minimum weight matching may be obtained as follows:
 
 ```cs
 var cost = new[,] {{400, 150, 400, 1}, {400, 450, 600, 2}, {300, 225, 300, double.PositiveInfinity}};
