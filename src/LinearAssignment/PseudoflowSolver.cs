@@ -28,13 +28,20 @@ namespace LinearAssignment
     public class PseudoflowSolver : ISolver
     {
         private readonly double _alpha;
+        private readonly double? _initialEpsilon;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PseudoflowSolver"/> class.
         /// </summary>
         /// <param name="alpha">The cost-scaling reduction factor.</param>
-        public PseudoflowSolver(double alpha = 10) =>
+        /// <param name="initialEpsilon">Initial cost-scaling. If undefined, this will be
+        /// calculated to be the largest cost. Set this if you know the ballpark magnitude
+        /// of the costs to avoid having to determine the largest cost.</param>
+        public PseudoflowSolver(double alpha = 10, double? initialEpsilon = null)
+        {
             _alpha = alpha;
+            _initialEpsilon = initialEpsilon;
+        }
 
         public Assignment Solve(double[,] cost) =>
             throw new NotImplementedException("The pseudoflow solver can only be used with integer costs");
@@ -84,12 +91,18 @@ namespace LinearAssignment
                 }
             }
 
-            // Initialize epsilon to be the largest cost
-            var epsilon = double.NegativeInfinity;
-            for (var i = 0; i < n; i++)
+            // Initialize cost-scaling to be the configured value if given, and
+            // otherwise let it be the largest given cost.
+            double epsilon;
+            if (_initialEpsilon.HasValue) epsilon = _initialEpsilon.Value;
+            else
+            {
+                epsilon = double.NegativeInfinity;
+                for (var i = 0; i < n; i++)
                 for (var j = 0; j < n; j++)
                     if (cost[i, j] > epsilon && cost[i, j] != int.MaxValue)
                         epsilon = cost[i, j];
+            }
 
             // Initialize dual variables and assignment variables keeping track of
             // assignments as we move along: col maps a given row to the column
