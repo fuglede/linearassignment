@@ -59,7 +59,8 @@ namespace LinearAssignment
                 throw new NotImplementedException("Pseudoflow is only implemented for square matrices");
             var n = nr;
 
-            // To simplify our double-push, first eliminate rows with only a single incident edge
+            // To simplify our double-push, first eliminate rows with only a single incident edge.
+            // These will then be re-added when we construct our result at the end of the day.
             var skippedAssignments = new Dictionary<int, int>();
             var assignableRows = Enumerable.Range(0, n).ToList();
             var assignableColumns = Enumerable.Range(0, n).ToList();
@@ -120,7 +121,9 @@ namespace LinearAssignment
                 for (var j = 0; j < n; j++) row[j] = -1;
                 // We also maintain a stack of rows that have not been assigned. We
                 // could get this information from the variable col, but being able to
-                // just pop the stack to get new unassigned rows is much faster.
+                // just pop the stack to get new unassigned rows is much faster. We put
+                // lower numbers at the top of the stack simply because that feels a bit
+                // more natural; we could get rid of the Reverse if we wanted to.
                 var unassigned = new Stack<int>(Enumerable.Range(1, n - 1).Reverse());
                 var k = 0;
                 for (var i = 0; i < n; i++)
@@ -135,7 +138,7 @@ namespace LinearAssignment
 
                 while (true)
                 {
-                    // Perform double push. The halting condition is that all rows
+                    // Perform double-push. The halting condition is that all rows
                     // have been assigned, which corresponds to the stack of unassigned
                     // rows having been emptied.
                     var smallest = double.PositiveInfinity;
