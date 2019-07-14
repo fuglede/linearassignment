@@ -105,10 +105,11 @@ namespace LinearAssignment
             // assignments as we move along: col maps a given row to the column
             // it's assigned to, and conversely row maps a given column to its
             // assigned row.
-            var u = new double[n];
+            //var u = new double[n];
             var v = new double[n];
             var col = new int[n];
             var row = new int[n];
+
             while (epsilon >= 1d / n)
             {
                 epsilon /= _alpha;
@@ -122,16 +123,17 @@ namespace LinearAssignment
                 // more natural; we could get rid of the Reverse if we wanted to.
                 var unassigned = new Stack<int>(Enumerable.Range(1, n - 1).Reverse());
                 var k = 0;
-                for (var i = 0; i < n; i++)
-                {
-                    for (var j = 0; j < n; j++)
-                    {
-                        var c = cost[i, j] - v[j];
-                        if (c < u[i])
-                            u[i] = c;
-                    }
-                }
-
+                // At this point, Burkard--Dell'Amico--Martello would update
+                // the dual variable u. However, as they note, and as is noted in
+                // Goldberg--Kennedy, the variable is only used to evaluate the reduced costs
+                // when determining the smallest and second smallest reduced costs in the first
+                // part of the double-push. However, we actually only care about the argmin and
+                // the arg-second-min, which end up being independent of the value of u. This is
+                // also apparent from the original implementation of CSA-Q, in which only the
+                // partial reduced costs are used. The bottom-line is that we never need to
+                // calculate u or any of the reduced costs; we can do with only v and partial
+                // reduced costs instead; doing so provides a large speed increase over the
+                // naive implementation -- and simpler code.
                 while (true)
                 {
                     // Perform double-push. The halting condition is that all rows
@@ -141,22 +143,22 @@ namespace LinearAssignment
                     var j = -1;
                     var secondSmallest = double.PositiveInfinity;
                     var z = -1;
-                    var uk = u[k];
+                    
                     for (var jp = 0; jp < n; jp++)
                     {
-                        var reducedCost = cost[k, jp] - uk - v[jp];
-                        if (reducedCost <= secondSmallest)
+                        var partialReducedCost = cost[k, jp] - v[jp];
+                        if (partialReducedCost <= secondSmallest)
                         {
-                            if (reducedCost <= smallest)
+                            if (partialReducedCost <= smallest)
                             {
                                 secondSmallest = smallest;
-                                smallest = reducedCost;
+                                smallest = partialReducedCost;
                                 z = j;
                                 j = jp;
                             }
                             else
                             {
-                                secondSmallest = reducedCost;
+                                secondSmallest = partialReducedCost;
                                 z = jp;
                             }
                         }
@@ -164,13 +166,13 @@ namespace LinearAssignment
 
                     col[k] = j;
                     // TODO: Detect infeasibility by investigating dual updates.
-                    u[k] = cost[k, z] - v[z];
+                    var u = cost[k, z] - v[z];
 
                     if (row[j] != -1)
                     {
                         var i = row[j];
                         row[j] = k;
-                        v[j] = cost[k, j] - u[k] - epsilon;
+                        v[j] = cost[k, j] - u - epsilon;
                         col[i] = -1;
                         k = i;
                     }
