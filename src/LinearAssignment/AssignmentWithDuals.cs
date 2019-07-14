@@ -25,5 +25,8 @@
         /// The potential of the columns.
         /// </summary>
         public double[] DualV { get; }
+
+        public override Assignment Transpose() =>
+            new AssignmentWithDuals(RowAssignment, ColumnAssignment, DualV, DualU);
     }
 }

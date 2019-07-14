@@ -61,15 +61,9 @@ namespace LinearAssignment
                     for (var ip = 0; ip < nr; ip++)
                         solutionWithDuals.DualU[ip] += min;
                 if (maximize) FlipDualSigns(solutionWithDuals.DualU, solutionWithDuals.DualV);
-                if (transpose)
-                    solution = new AssignmentWithDuals(solutionWithDuals.RowAssignment,
-                        solutionWithDuals.ColumnAssignment,
-                        solutionWithDuals.DualV, solutionWithDuals.DualU);
             }
-            else if (transpose)
-            {
-                solution = new Assignment(solution.RowAssignment, solution.ColumnAssignment);
-            }
+
+            if (transpose) solution = solution.Transpose();
 
             return solution;
         }
@@ -127,16 +121,10 @@ namespace LinearAssignment
                     for (var ip = 0; ip < solutionWithDuals.DualU.Length; ip++)
                         solutionWithDuals.DualU[ip] += min;
 
-                if (transpose)
-                    solution = new AssignmentWithDuals(solutionWithDuals.RowAssignment, solutionWithDuals.ColumnAssignment,
-                        solutionWithDuals.DualV, solutionWithDuals.DualU);
-
                 if (maximize) FlipDualSigns(solutionWithDuals.DualU, solutionWithDuals.DualV);
             }
-            else if (transpose)
-            {
-                solution = new Assignment(solution.RowAssignment, solution.ColumnAssignment);
-            }
+
+            if (transpose) solution = solution.Transpose();
 
             return solution;
         }

@@ -27,5 +27,6 @@
         /// </summary>
         public int[] RowAssignment { get; }
 
+        public virtual Assignment Transpose() => new Assignment(RowAssignment, ColumnAssignment);
     }
 }
