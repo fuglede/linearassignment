@@ -124,7 +124,7 @@ namespace LinearAssignment
                 }
             }
 
-            return new Assignment(x, y, u, v);
+            return new AssignmentWithDuals(x, y, u, v);
         }
 
         public Assignment Solve(int[,] cost)

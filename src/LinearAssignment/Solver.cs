@@ -24,7 +24,7 @@ namespace LinearAssignment
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
             if (nr == 0 || nc == 0)
-                return new Assignment(new int[] { }, new int[] { },
+                return new AssignmentWithDuals(new int[] { }, new int[] { },
                     new double[] { }, new double[] { });
             // We handle maximization by changing all signs in the given cost, then
             // minimizing the result. At the end of the day, we also make sure to
@@ -55,14 +55,21 @@ namespace LinearAssignment
             if (solver == null) solver = new ShortestPathSolver();
             var solution = solver.Solve(cost);
 
-            if (min != 0)
-                for (var ip = 0; ip < nr; ip++)
-                    solution.DualU[ip] += min;
-
-            if (transpose)
-                solution = new Assignment(solution.RowAssignment, solution.ColumnAssignment, solution.DualV, solution.DualU);
-
-            if (maximize) FlipDualSigns(solution.DualU, solution.DualV);
+            if (solution is AssignmentWithDuals solutionWithDuals)
+            {
+                if (min != 0)
+                    for (var ip = 0; ip < nr; ip++)
+                        solutionWithDuals.DualU[ip] += min;
+                if (maximize) FlipDualSigns(solutionWithDuals.DualU, solutionWithDuals.DualV);
+                if (transpose)
+                    solution = new AssignmentWithDuals(solutionWithDuals.RowAssignment,
+                        solutionWithDuals.ColumnAssignment,
+                        solutionWithDuals.DualV, solutionWithDuals.DualU);
+            }
+            else if (transpose)
+            {
+                solution = new Assignment(solution.RowAssignment, solution.ColumnAssignment);
+            }
 
             return solution;
         }
@@ -82,7 +89,7 @@ namespace LinearAssignment
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
             if (nr == 0 || nc == 0)
-                return new Assignment(new int[] { }, new int[] { },
+                return new AssignmentWithDuals(new int[] { }, new int[] { },
                     new double[] { }, new double[] { });
 
             // As in the double case, maximization is handled by flipping the sign; here, we need
@@ -114,14 +121,23 @@ namespace LinearAssignment
                 solver = nr == nc ? (ISolver) new PseudoflowSolver() : new ShortestPathSolver();
             var solution = solver.Solve(cost);
 
-            if (min != 0)
-                for (var ip = 0; ip < solution.DualU.Length; ip++)
-                    solution.DualU[ip] += min;
+            if (solution is AssignmentWithDuals solutionWithDuals)
+            {
+                if (min != 0)
+                    for (var ip = 0; ip < solutionWithDuals.DualU.Length; ip++)
+                        solutionWithDuals.DualU[ip] += min;
 
-            if (transpose)
-                solution = new Assignment(solution.RowAssignment, solution.ColumnAssignment, solution.DualV, solution.DualU);
+                if (transpose)
+                    solution = new AssignmentWithDuals(solutionWithDuals.RowAssignment, solutionWithDuals.ColumnAssignment,
+                        solutionWithDuals.DualV, solutionWithDuals.DualU);
 
-            if (maximize) FlipDualSigns(solution.DualU, solution.DualV);
+                if (maximize) FlipDualSigns(solutionWithDuals.DualU, solutionWithDuals.DualV);
+            }
+            else if (transpose)
+            {
+                solution = new Assignment(solution.RowAssignment, solution.ColumnAssignment);
+            }
+
             return solution;
         }
 

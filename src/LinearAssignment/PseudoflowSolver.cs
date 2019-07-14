@@ -195,7 +195,7 @@ namespace LinearAssignment
                 columnAssignment[assignableRows[i]] = assignableColumns[col[i]];
                 rowAssignment[assignableColumns[col[i]]] = assignableRows[i];
             }
-            return new Assignment(columnAssignment, rowAssignment, u, v);
+            return new Assignment(columnAssignment, rowAssignment);
         }
 
         /// <summary>

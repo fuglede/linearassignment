@@ -17,10 +17,12 @@ namespace LinearAssignment.Tests
         {
             var solver = new ShortestPathSolver();
             var solution = solver.Solve(cost);
+            Assert.IsAssignableFrom<AssignmentWithDuals>(solution);
+            var solutionWithDuals = (AssignmentWithDuals) solution;
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
-            Assert.Equal(expectedDualU, solution.DualU);
-            Assert.Equal(expectedDualV, solution.DualV);
+            Assert.Equal(expectedDualU, solutionWithDuals.DualU);
+            Assert.Equal(expectedDualV, solutionWithDuals.DualV);
         }
 
         /// <summary>

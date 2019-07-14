@@ -1,19 +1,14 @@
 ﻿namespace LinearAssignment
 {
-    /// <summary>
-    /// Represents a solution to the linear assignment problem.
-    /// </summary>
-    public readonly ref struct Assignment
+    public class Assignment
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Assignment"/> struct.
         /// </summary>
-        public Assignment(int[] columnAssignment, int[] rowAssignment, double[] dualU, double[] dualV)
+        public Assignment(int[] columnAssignment, int[] rowAssignment)
         {
             ColumnAssignment = columnAssignment;
             RowAssignment = rowAssignment;
-            DualU = dualU;
-            DualV = dualV;
         }
 
         /// <summary>
@@ -32,14 +27,5 @@
         /// </summary>
         public int[] RowAssignment { get; }
 
-        /// <summary>
-        /// The potential of the rows.
-        /// </summary>
-        public double[] DualU { get; }
-
-        /// <summary>
-        /// The potential of the columns.
-        /// </summary>
-        public double[] DualV { get; }
     }
 }
