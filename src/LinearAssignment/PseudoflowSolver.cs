@@ -202,21 +202,29 @@ namespace LinearAssignment
             return new Assignment(columnAssignment, rowAssignment, u, v);
         }
 
-        private static int[,] TrimArray(int rowToRemove, int columnToRemove, int[,] originalArray)
+        /// <summary>
+        /// Remove a row and a column from an 2D array.
+        /// </summary>
+        /// <param name="rowToRemove">The index of the row to remove.</param>
+        /// <param name="columnToRemove">The index of the column to remove.</param>
+        /// <param name="array">The array from which the row and column should be removed.</param>
+        /// <returns>A 2D array with the row and column removed, whose number of elements is one
+        /// smaller than the input array in each dimension.</returns>
+        private static int[,] TrimArray(int rowToRemove, int columnToRemove, int[,] array)
         {
-            var result = new int[originalArray.GetLength(0) - 1, originalArray.GetLength(1) - 1];
+            var result = new int[array.GetLength(0) - 1, array.GetLength(1) - 1];
 
-            for (int i = 0, j = 0; i < originalArray.GetLength(0); i++)
+            for (int i = 0, j = 0; i < array.GetLength(0); i++)
             {
                 if (i == rowToRemove)
                     continue;
 
-                for (int k = 0, u = 0; k < originalArray.GetLength(1); k++)
+                for (int k = 0, u = 0; k < array.GetLength(1); k++)
                 {
                     if (k == columnToRemove)
                         continue;
 
-                    result[j, u] = originalArray[i, k];
+                    result[j, u] = array[i, k];
                     u++;
                 }
                 j++;
