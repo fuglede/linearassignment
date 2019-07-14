@@ -110,7 +110,8 @@ namespace LinearAssignment
             else
                 min = 0;
 
-            if (solver == null) solver = new PseudoflowSolver();
+            if (solver == null)
+                solver = nr == nc ? (ISolver) new PseudoflowSolver() : new ShortestPathSolver();
             var solution = solver.Solve(cost);
 
             if (min != 0)
