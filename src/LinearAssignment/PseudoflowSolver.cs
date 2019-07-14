@@ -142,8 +142,6 @@ namespace LinearAssignment
                     var smallest = double.PositiveInfinity;
                     var j = -1;
                     var secondSmallest = double.PositiveInfinity;
-                    var z = -1;
-                    
                     for (var jp = 0; jp < n; jp++)
                     {
                         var partialReducedCost = cost[k, jp] - v[jp];
@@ -153,26 +151,26 @@ namespace LinearAssignment
                             {
                                 secondSmallest = smallest;
                                 smallest = partialReducedCost;
-                                z = j;
                                 j = jp;
                             }
                             else
                             {
                                 secondSmallest = partialReducedCost;
-                                z = jp;
                             }
                         }
                     }
 
                     col[k] = j;
                     // TODO: Detect infeasibility by investigating dual updates.
-                    var u = cost[k, z] - v[z];
-
                     if (row[j] != -1)
                     {
                         var i = row[j];
                         row[j] = k;
-                        v[j] = cost[k, j] - u - epsilon;
+                        // The Burkard--Dell'Amico--Martello updates v[j] to be cost[k, j] - u[k] - epsilon,
+                        // but cost[k, j] - u[k] = v[j] + smallest - secondSmallest; using this instead avoids a
+                        // few costly cost lookups.
+                        v[j] += smallest - secondSmallest - epsilon;
+
                         col[i] = -1;
                         k = i;
                     }
