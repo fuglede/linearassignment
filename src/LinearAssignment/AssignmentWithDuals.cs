@@ -28,5 +28,9 @@
 
         public override Assignment Transpose() =>
             new AssignmentWithDuals(RowAssignment, ColumnAssignment, DualV, DualU);
+
+        public static readonly AssignmentWithDuals Empty =
+            new AssignmentWithDuals(new int[] { }, new int[] { },
+                new double[] { }, new double[] { });
     }
 }

@@ -23,9 +23,8 @@ namespace LinearAssignment
             var transpose = Transpose(ref cost);
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
-            if (nr == 0 || nc == 0)
-                return new AssignmentWithDuals(new int[] { }, new int[] { },
-                    new double[] { }, new double[] { });
+            if (nr == 0 || nc == 0) return AssignmentWithDuals.Empty;
+
             // We handle maximization by changing all signs in the given cost, then
             // minimizing the result. At the end of the day, we also make sure to
             // update the dual variables accordingly.
@@ -82,9 +81,7 @@ namespace LinearAssignment
             var transpose = Transpose(ref cost);
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
-            if (nr == 0 || nc == 0)
-                return new AssignmentWithDuals(new int[] { }, new int[] { },
-                    new double[] { }, new double[] { });
+            if (nr == 0 || nc == 0) return AssignmentWithDuals.Empty;
 
             // As in the double case, maximization is handled by flipping the sign; here, we need
             // to take special care when dealing with "infinities".
