@@ -18,6 +18,19 @@ namespace LinearAssignment.Tests
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
         }
+        [Theory]
+        [MemberData(nameof(TestDataMinimize))]
+        public void SolveSparseGivesExpectedResultWhenMinimizing(
+            int[,] dense,
+            int[] expectedColumnAssignment,
+            int[] expectedRowAssignment)
+        {
+            var cost = new SparseMatrix(dense);
+            var solver = new PseudoflowSolver();
+            var solution = solver.Solve(cost);
+            Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
+            Assert.Equal(expectedRowAssignment, solution.RowAssignment);
+        }
 
         /// <summary>
         /// Include tests from the Python library scipy.optimize.

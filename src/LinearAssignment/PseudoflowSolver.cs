@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace LinearAssignment
 {
@@ -46,11 +47,35 @@ namespace LinearAssignment
         public Assignment Solve(double[,] cost) =>
             throw new NotImplementedException("The pseudoflow solver can only be used with integer costs");
 
-        public Assignment Solve(int[,] cost)
+        public Assignment Solve(int[,] cost) => Solve(cost, null);
+
+        public Assignment Solve(SparseMatrix cost) => Solve(null, cost);
+
+        private Assignment Solve(int[,] costDense, SparseMatrix costSparse)
         {
+            // The signature here is kind of nasty; it would be much nicer if we could split
+            // out the method into one for the dense case, and one for the sparse case. However,
+            // if we want to avoid code duplication, some sort of abstractions need to be in
+            // place for the (substantial) parts of the algorithm that they have in common, and
+            // including such abstractions is impossible without incurring a performance penalty
+            // in some of our hot loops, which is an even worse alternative.
+            if (costDense != null && costSparse != null)
+                throw new ArgumentException("Only one parameter may be non-null.");
+
+            var isSparse = costSparse != null;
+            List<int> ia = null;
+            List<int> a = null;
+            List<int> ca = null;
+            if (isSparse)
+            {
+                ia = costSparse.IA;
+                a = costSparse.A;
+                ca = costSparse.CA;
+            }
+
             // TODO: Allow rectangular inputs
-            var nr = cost.GetLength(0);
-            var nc = cost.GetLength(1);
+            var nr = isSparse ? costSparse.NumRows : costDense.GetLength(0);
+            var nc = isSparse ? costSparse.NumColumns : costDense.GetLength(1);
             if (nr != nc)
                 throw new NotImplementedException("Pseudoflow is only implemented for square matrices");
             var n = nr;
@@ -60,31 +85,103 @@ namespace LinearAssignment
             var skippedAssignments = new Dictionary<int, int>();
             var assignableRows = Enumerable.Range(0, n).ToList();
             var assignableColumns = Enumerable.Range(0, n).ToList();
-            trim:
-            for (var i = 0; i < n; i++)
+
+            if (isSparse)
             {
-                var hasEdge = false;
-                var hasMultipleEdges = false;
-                var column = -1;
-                for (var j = 0; j < n && !hasMultipleEdges; j++)
+                trimSparse:
+                for (var i = 0; i < n; i++)
                 {
-                    if (cost[i, j] != int.MaxValue)
+                    var nonInfinite = ia[i + 1] - ia[i];
+                    if (nonInfinite == 0)
+                        throw new InvalidOperationException("No feasible solution exists.");
+                    // If there is exactly one value in a row, remove that row and the
+                    // corresponding column.
+                    if (nonInfinite == 1)
                     {
-                        hasMultipleEdges = hasEdge;
-                        hasEdge = true;
-                        column = j;
+                        var m = a.Count;
+                        var column = ca[ia[i]];
+                        // Make a copy of IA; we'll update that later.
+                        var newIa = new List<int>(ia);
+                        // Keep track of how many elements have been removed (i.e. how many values
+                        // belong to the column to be removed).
+                        var removed = 0;
+                        // Find all elements whose column is going to be removed.
+                        for (var k = 0; k < m; k++)
+                        {
+                            if (ca[k] == column)
+                            {
+                                // Find the row of element k
+                                var rowIndex = 0;
+                                for (var currentRow = 0; currentRow < n; currentRow++)
+                                {
+                                    if (ia[currentRow + 1] > k + removed)
+                                    {
+                                        rowIndex = currentRow;
+                                        break;
+                                    }
+                                }
+                                // For this row and all future ones, decrease ia by one.
+                                for (var l = rowIndex + 1; l < n + 1; l++)
+                                    newIa[l]--;
+                                // Finally, remove this element; we will remove the row from IA later.
+                                removed++;
+                                a.RemoveAt(k);
+                                ca.RemoveAt(k);
+                                k--;
+                                m--;
+                            }
+                        }
+                        // Note what we removed.
+                        skippedAssignments[assignableRows[i]] = assignableColumns[column];
+                        assignableRows.Remove(assignableRows[i]);
+                        assignableColumns.Remove(assignableColumns[column]);
+                        // Remove the row from IA as well.
+                        ia = newIa;
+                        ia.RemoveAt(i);
+                        n--;
+                        // Decrease the column index of all values to the right
+                        // of the column that we removed.
+                        for (var k = 0; k < m; k++)
+                            if (ca[k] > column)
+                                ca[k]--;
+                        // As the matrix might now have other rows with only a single
+                        // value, repeat the process.
+                        goto trimSparse;
                     }
                 }
-                if (!hasEdge)
-                    throw new InvalidOperationException("No feasible solution exists.");
-                if (!hasMultipleEdges)
+            }
+            else
+            {
+                // Trimming the dense array boils down to recursively removing rows/columns
+                trim:
+                for (var i = 0; i < n; i++)
                 {
-                    skippedAssignments[assignableRows[i]] = assignableColumns[column];
-                    n--;
-                    assignableRows.Remove(assignableRows[i]);
-                    assignableColumns.Remove(assignableColumns[column]);
-                    cost = TrimArray(i, column, cost);
-                    goto trim;
+                    // As we loop over each row, if we find more than two non-infinite columns
+                    // we can break as we are only interested in those with only a single one.
+                    var hasEdge = false;
+                    var hasMultipleEdges = false;
+                    var column = -1;
+                    for (var j = 0; j < n && !hasMultipleEdges; j++)
+                    {
+                        if (costDense[i, j] != int.MaxValue)
+                        {
+                            hasMultipleEdges = hasEdge;
+                            hasEdge = true;
+                            column = j;
+                        }
+                    }
+
+                    if (!hasEdge)
+                        throw new InvalidOperationException("No feasible solution exists.");
+                    if (!hasMultipleEdges)
+                    {
+                        skippedAssignments[assignableRows[i]] = assignableColumns[column];
+                        n--;
+                        assignableRows.Remove(assignableRows[i]);
+                        assignableColumns.Remove(assignableColumns[column]);
+                        costDense = TrimArray(i, column, costDense);
+                        goto trim;
+                    }
                 }
             }
 
@@ -92,20 +189,20 @@ namespace LinearAssignment
             // otherwise let it be the largest given cost.
             double epsilon;
             if (_initialEpsilon.HasValue) epsilon = _initialEpsilon.Value;
+            else if (isSparse) epsilon = costSparse.MaxValue;
             else
             {
                 epsilon = double.NegativeInfinity;
                 for (var i = 0; i < n; i++)
                 for (var j = 0; j < n; j++)
-                    if (cost[i, j] > epsilon && cost[i, j] != int.MaxValue)
-                        epsilon = cost[i, j];
+                    if (costDense[i, j] > epsilon && costDense[i, j] != int.MaxValue)
+                        epsilon = costDense[i, j];
             }
 
             // Initialize dual variables and assignment variables keeping track of
             // assignments as we move along: col maps a given row to the column
             // it's assigned to, and conversely row maps a given column to its
             // assigned row.
-            //var u = new double[n];
             var v = new double[n];
             var col = new int[n];
             var row = new int[n];
@@ -142,20 +239,46 @@ namespace LinearAssignment
                     var smallest = double.PositiveInfinity;
                     var j = -1;
                     var secondSmallest = double.PositiveInfinity;
-                    for (var jp = 0; jp < n; jp++)
+                    // Again, below we find some duplication in the gap calculation, but this
+                    // is all in the name of performance.
+                    if (isSparse)
                     {
-                        var partialReducedCost = cost[k, jp] - v[jp];
-                        if (partialReducedCost <= secondSmallest)
+                        for (var m = ia[k]; m < ia[k + 1]; m++)
                         {
-                            if (partialReducedCost <= smallest)
+                            var jp = ca[m];
+                            var partialReducedCost = a[m] - v[jp];
+                            if (partialReducedCost <= secondSmallest)
                             {
-                                secondSmallest = smallest;
-                                smallest = partialReducedCost;
-                                j = jp;
+                                if (partialReducedCost <= smallest)
+                                {
+                                    secondSmallest = smallest;
+                                    smallest = partialReducedCost;
+                                    j = jp;
+                                }
+                                else
+                                {
+                                    secondSmallest = partialReducedCost;
+                                }
                             }
-                            else
+                        }
+                    }
+                    else
+                    {
+                        for (var jp = 0; jp < n; jp++)
+                        {
+                            var partialReducedCost = costDense[k, jp] - v[jp];
+                            if (partialReducedCost <= secondSmallest)
                             {
-                                secondSmallest = partialReducedCost;
+                                if (partialReducedCost <= smallest)
+                                {
+                                    secondSmallest = smallest;
+                                    smallest = partialReducedCost;
+                                    j = jp;
+                                }
+                                else
+                                {
+                                    secondSmallest = partialReducedCost;
+                                }
                             }
                         }
                     }
