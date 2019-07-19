@@ -80,111 +80,6 @@ namespace LinearAssignment
                 throw new NotImplementedException("Pseudoflow is only implemented for square matrices");
             var n = nr;
 
-            // To simplify our double-push, first eliminate rows with only a single incident edge.
-            // These will then be re-added when we construct our result at the end of the day.
-            var skippedAssignments = new Dictionary<int, int>();
-            var assignableRows = Enumerable.Range(0, n).ToList();
-            var assignableColumns = Enumerable.Range(0, n).ToList();
-
-            if (isSparse)
-            {
-                trimSparse:
-                for (var i = 0; i < n; i++)
-                {
-                    var nonInfinite = ia[i + 1] - ia[i];
-                    if (nonInfinite == 0)
-                        throw new InvalidOperationException("No feasible solution exists.");
-                    // If there is exactly one value in a row, remove that row and the
-                    // corresponding column.
-                    if (nonInfinite == 1)
-                    {
-                        var m = a.Count;
-                        var column = ca[ia[i]];
-                        // Make a copy of IA; we'll update that later.
-                        var newIa = new List<int>(ia);
-                        // Keep track of how many elements have been removed (i.e. how many values
-                        // belong to the column to be removed).
-                        var removed = 0;
-                        // Find all elements whose column is going to be removed.
-                        for (var k = 0; k < m; k++)
-                        {
-                            if (ca[k] == column)
-                            {
-                                // Find the row of element k
-                                var rowIndex = 0;
-                                for (var currentRow = 0; currentRow < n; currentRow++)
-                                {
-                                    if (ia[currentRow + 1] > k + removed)
-                                    {
-                                        rowIndex = currentRow;
-                                        break;
-                                    }
-                                }
-                                // For this row and all future ones, decrease ia by one.
-                                for (var l = rowIndex + 1; l < n + 1; l++)
-                                    newIa[l]--;
-                                // Finally, remove this element; we will remove the row from IA later.
-                                removed++;
-                                a.RemoveAt(k);
-                                ca.RemoveAt(k);
-                                k--;
-                                m--;
-                            }
-                        }
-                        // Note what we removed.
-                        skippedAssignments[assignableRows[i]] = assignableColumns[column];
-                        assignableRows.Remove(assignableRows[i]);
-                        assignableColumns.Remove(assignableColumns[column]);
-                        // Remove the row from IA as well.
-                        ia = newIa;
-                        ia.RemoveAt(i);
-                        n--;
-                        // Decrease the column index of all values to the right
-                        // of the column that we removed.
-                        for (var k = 0; k < m; k++)
-                            if (ca[k] > column)
-                                ca[k]--;
-                        // As the matrix might now have other rows with only a single
-                        // value, repeat the process.
-                        goto trimSparse;
-                    }
-                }
-            }
-            else
-            {
-                // Trimming the dense array boils down to recursively removing rows/columns
-                trim:
-                for (var i = 0; i < n; i++)
-                {
-                    // As we loop over each row, if we find more than two non-infinite columns
-                    // we can break as we are only interested in those with only a single one.
-                    var hasEdge = false;
-                    var hasMultipleEdges = false;
-                    var column = -1;
-                    for (var j = 0; j < n && !hasMultipleEdges; j++)
-                    {
-                        if (costDense[i, j] != int.MaxValue)
-                        {
-                            hasMultipleEdges = hasEdge;
-                            hasEdge = true;
-                            column = j;
-                        }
-                    }
-
-                    if (!hasEdge)
-                        throw new InvalidOperationException("No feasible solution exists.");
-                    if (!hasMultipleEdges)
-                    {
-                        skippedAssignments[assignableRows[i]] = assignableColumns[column];
-                        n--;
-                        assignableRows.Remove(assignableRows[i]);
-                        assignableColumns.Remove(assignableColumns[column]);
-                        costDense = TrimArray(i, column, costDense);
-                        goto trim;
-                    }
-                }
-            }
-
             // Initialize cost-scaling to be the configured value if given, and
             // otherwise let it be the largest given cost.
             double epsilon;
@@ -292,6 +187,10 @@ namespace LinearAssignment
                         // The Burkard--Dell'Amico--Martello updates v[j] to be cost[k, j] - u[k] - epsilon,
                         // but cost[k, j] - u[k] = v[j] + smallest - secondSmallest; using this instead avoids a
                         // few costly cost lookups.
+                        // Note moreover that if k only has a single incident egde, then secondSmallest becomes
+                        // double.NegativeInfinity. This in turn means that j will never be picked as the smallest
+                        // or second smallest element again, which guarantees that j will be forever assigned to k,
+                        // which is exactly what we want.
                         v[j] += smallest - secondSmallest - epsilon;
 
                         col[i] = -1;
@@ -307,21 +206,7 @@ namespace LinearAssignment
                 }
             }
 
-            // Re-add the assignments we fixed in the beginning.
-            var columnAssignment = new int[n + skippedAssignments.Count];
-            var rowAssignment = new int[n + skippedAssignments.Count];
-            foreach (var preassigned in skippedAssignments)
-            {
-                columnAssignment[preassigned.Key] = preassigned.Value;
-                rowAssignment[preassigned.Value] = preassigned.Key;
-            }
-
-            for (var i = 0; i < n; i++)
-            {
-                columnAssignment[assignableRows[i]] = assignableColumns[col[i]];
-                rowAssignment[assignableColumns[col[i]]] = assignableRows[i];
-            }
-            return new Assignment(columnAssignment, rowAssignment);
+            return new Assignment(col, row);
         }
 
         /// <summary>

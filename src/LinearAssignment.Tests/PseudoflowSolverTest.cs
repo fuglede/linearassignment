@@ -75,21 +75,13 @@ namespace LinearAssignment.Tests
             {
                 new[,]
                 {
-                    {11, 1, 10},
-                    {int.MaxValue, 11, int.MaxValue},
-                    {int.MaxValue, 7, 12}
+                    {110000, 10000, 100000},
+                    {int.MaxValue, 110000, int.MaxValue},
+                    {int.MaxValue, 70000, 120000}
                 },
                 new[] {0, 1, 2},
                 new[] {0, 1, 2}
             }
         };
-
-        [Fact]
-        public void SolveThrowsWhenNoFeasibleSolutionExists()
-        {
-            var cost = new[,] { { int.MaxValue } };
-            var solver = new PseudoflowSolver();
-            Assert.Throws<InvalidOperationException>(() => solver.Solve(cost));
-        }
     }
 }
