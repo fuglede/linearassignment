@@ -161,6 +161,8 @@ namespace LinearAssignment
         {
             var nr = cost.NumRows;
             var nc = cost.NumColumns;
+            if (nr != nc)
+                throw new NotImplementedException("Sparse implementation works only for square matrices");
             var v = new double[nc];
             var x = Enumerable.Repeat(-1, nr).ToArray();
             var y = Enumerable.Repeat(-1, nc).ToArray();
