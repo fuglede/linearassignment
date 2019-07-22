@@ -157,7 +157,7 @@ namespace LinearAssignment
             return Solve(doubleCost);
         }
 
-        public Assignment Solve(SparseMatrix cost)
+        public Assignment Solve(SparseMatrixInt cost)
         {
             var nr = cost.NumRows;
             var nc = cost.NumColumns;

@@ -33,7 +33,7 @@ namespace LinearAssignment.Tests
             int[] expectedRowAssignment)
         {
             var solver = new ShortestPathSolver();
-            var cost = new SparseMatrix(dense);
+            var cost = new SparseMatrixInt(dense);
             var solution = solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);

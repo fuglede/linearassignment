@@ -49,9 +49,9 @@ namespace LinearAssignment
 
         public Assignment Solve(int[,] cost) => Solve(cost, null);
 
-        public Assignment Solve(SparseMatrix cost) => Solve(null, cost);
+        public Assignment Solve(SparseMatrixInt cost) => Solve(null, cost);
 
-        private Assignment Solve(int[,] costDense, SparseMatrix costSparse)
+        private Assignment Solve(int[,] costDense, SparseMatrixInt costSparse)
         {
             // The signature here is kind of nasty; it would be much nicer if we could split
             // out the method into one for the dense case, and one for the sparse case. However,

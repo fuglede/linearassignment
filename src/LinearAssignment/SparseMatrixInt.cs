@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace LinearAssignment
 {
     /// <summary>
-    /// Represents a sparse matrix in compressed sparse row (CSR) format.
+    /// Represents a sparse matrix in compressed sparse row (CSR) format whose elements
+    /// are integers.
     /// </summary>
-    public class SparseMatrix
+    public class SparseMatrixInt
     {
-        public SparseMatrix(int[,] dense, int empty = int.MaxValue)
+        public SparseMatrixInt(int[,] dense, int empty = int.MaxValue)
         {
             A = new List<int>();
             IA = new List<int>();
@@ -23,7 +23,7 @@ namespace LinearAssignment
                 for (int j = 0; j < nc; j++)
                 {
                     int entry = dense[i, j];
-                    if (!entry.Equals(empty))
+                    if (entry != empty)
                     {
                         nonInfinite++;
                         A.Add(entry);

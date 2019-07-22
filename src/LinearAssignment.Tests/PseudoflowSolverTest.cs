@@ -25,7 +25,7 @@ namespace LinearAssignment.Tests
             int[] expectedColumnAssignment,
             int[] expectedRowAssignment)
         {
-            var cost = new SparseMatrix(dense);
+            var cost = new SparseMatrixInt(dense);
             var solver = new PseudoflowSolver();
             var solution = solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
