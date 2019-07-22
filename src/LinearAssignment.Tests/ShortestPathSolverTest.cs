@@ -28,12 +28,12 @@ namespace LinearAssignment.Tests
         [Theory]
         [MemberData(nameof(TestDataSparse))]
         public void SolveSparseGivesExpectedResult(
-            int[,] dense,
+            double[,] dense,
             int[] expectedColumnAssignment,
             int[] expectedRowAssignment)
         {
             var solver = new ShortestPathSolver();
-            var cost = new SparseMatrixInt(dense);
+            var cost = new SparseMatrixDouble(dense);
             var solution = solver.Solve(cost);
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
@@ -108,13 +108,13 @@ namespace LinearAssignment.Tests
         {
             new object[]
             {
-                new [,] {{400, 150, 400}, {400, 450, 600}, {300, 225, 300}},
+                new double[,] {{400, 150, 400}, {400, 450, 600}, {300, 225, 300}},
                 new[] {1, 0, 2},
                 new[] {1, 0, 2}
             },
             new object[]
             {
-                new [,] {{10, 10, 8}, {9, 8, 1}, {9, 7, 4}},
+                new double[,] {{10, 10, 8}, {9, 8, 1}, {9, 7, 4}},
                 new[] {0, 2, 1},
                 new[] {0, 2, 1}
             },
@@ -122,9 +122,9 @@ namespace LinearAssignment.Tests
             {
                 new[,]
                 {
-                    {10, int.MaxValue, int.MaxValue},
-                    {int.MaxValue, int.MaxValue, 1},
-                    {int.MaxValue, 7, int.MaxValue}
+                    {10, double.PositiveInfinity, double.PositiveInfinity},
+                    {double.PositiveInfinity, double.PositiveInfinity, 1},
+                    {double.PositiveInfinity, 7, double.PositiveInfinity}
                 },
                 new[] {0, 2, 1},
                 new[] {0, 2, 1}
@@ -133,9 +133,9 @@ namespace LinearAssignment.Tests
             {
                 new[,]
                 {
-                    {int.MaxValue, 11, int.MaxValue},
+                    {double.PositiveInfinity, 11, double.PositiveInfinity},
                     {11, 1, 10},
-                    {int.MaxValue, 7, 12}
+                    {double.PositiveInfinity, 7, 12}
                 },
                 new[] {1, 0, 2},
                 new[] {1, 0, 2}
