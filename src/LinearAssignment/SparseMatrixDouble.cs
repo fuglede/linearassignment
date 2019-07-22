@@ -9,6 +9,21 @@ namespace LinearAssignment
     /// </summary>
     public class SparseMatrixDouble
     {
+        public SparseMatrixDouble(List<double> A, List<int> IA, List<int> CA, int numColumns)
+        {
+            this.A = A;
+            this.IA = IA;
+            this.CA = CA;
+            NumRows = IA.Count - 1;
+            NumColumns = numColumns;
+        }
+
+        public SparseMatrixDouble(SparseMatrixInt sparse) :
+            this(sparse.A.ConvertAll(x => (double)x), sparse.IA, sparse.CA, sparse.NumColumns)
+        {
+            _max = sparse.MaxValue;
+        }
+
         public SparseMatrixDouble(double[,] dense, double empty = double.PositiveInfinity)
         {
             A = new List<double>();
@@ -39,8 +54,8 @@ namespace LinearAssignment
             NumColumns = nc;
         }
 
-        private double _max = double.PositiveInfinity;
-        public double MaxValue => _max != double.PositiveInfinity ? _max : _max = A.Max();
+        private double _max = double.NegativeInfinity;
+        public double MaxValue => !double.IsNegativeInfinity(_max) ? _max : _max = A.Max();
         public List<double> A { get; }
         public List<int> IA { get; }
         public List<int> CA { get; }

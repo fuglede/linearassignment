@@ -9,6 +9,15 @@ namespace LinearAssignment
     /// </summary>
     public class SparseMatrixInt
     {
+        public SparseMatrixInt(List<int> A, List<int> IA, List<int> CA, int numColumns)
+        {
+            this.A = A;
+            this.IA = IA;
+            this.CA = CA;
+            NumRows = IA.Count - 1;
+            NumColumns = numColumns;
+        }
+
         public SparseMatrixInt(int[,] dense, int empty = int.MaxValue)
         {
             A = new List<int>();
@@ -40,7 +49,7 @@ namespace LinearAssignment
         }
 
         private int _max = int.MinValue;
-        public int MaxValue => _max != int.MaxValue ? _max : _max = A.Max();
+        public int MaxValue => _max != int.MinValue ? _max : _max = A.Max();
         public List<int> A { get; }
         public List<int> IA { get; }
         public List<int> CA { get; }
