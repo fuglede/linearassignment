@@ -24,17 +24,17 @@ which in turn is based closely on Section 4.4 of
     Assignment Problems - Revised Reprint
     Society for Industrial and Applied Mathematics, Philadelphia, 2012
 
-In Crouse's approach, the main reference is
+Our algorithm for this method is ported from the C++ implementation in [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html).
+
+For sparse inputs, i.e. inputs for which |*E*| is less than |*X*| |*Y*|, we include an implementation of LAPJVsp, which is also based on shortest augmenting paths. This algorithm is described in
 
     R. Jonker and A. Volgenant. A Shortest Augmenting Path Algorithm for
     Dense and Sparse Linear Assignment Problems. *Computing*, 38:325-340
     December 1987.
-    
-Here, most of the computational time is spent on initialization and setting up a useful solution prior to searching for shortest augmenting paths, where in the method at hand, all initialization is skipped, and we jump straight to augmentation.
 
-Our algorithm for this method is ported from the C++ implementation in [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html).
+and our implementation is a port of the Pascal code [available here](http://www.assignmentproblems.com/LAPJV.htm).
 
-Another method based on the pseudoflow approach to solving minimum cost flow problems. This is closely based on Section 4.6.4 of Assignment Problems, which in turn is based on the cost-scaling assignment (CSA) approach of
+We also include a different method based on the pseudoflow approach to solving minimum cost flow problems. This is closely based on Section 4.6.4 of Assignment Problems, which in turn is based on the cost-scaling assignment (CSA) approach of
 
     A.V. Goldberg and R. Kennedy.
     An efficient cost scaling algorithm for the assignment problem.

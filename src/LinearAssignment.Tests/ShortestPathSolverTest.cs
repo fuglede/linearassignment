@@ -25,6 +25,20 @@ namespace LinearAssignment.Tests
             Assert.Equal(expectedDualV, solutionWithDuals.DualV);
         }
 
+        [Theory]
+        [MemberData(nameof(TestDataSparse))]
+        public void SolveSparseGivesExpectedResult(
+            int[,] dense,
+            int[] expectedColumnAssignment,
+            int[] expectedRowAssignment)
+        {
+            var solver = new ShortestPathSolver();
+            var cost = new SparseMatrix(dense);
+            var solution = solver.Solve(cost);
+            Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
+            Assert.Equal(expectedRowAssignment, solution.RowAssignment);
+        }
+
         /// <summary>
         /// Include tests from the Python library scipy.optimize.
         /// </summary>
@@ -87,6 +101,44 @@ namespace LinearAssignment.Tests
                 new[] {1, 0, 2},
                 new double[] {21, 11, 13},
                 new double[] {0, -10, -1}
+            }
+        };
+
+        public static IEnumerable<object[]> TestDataSparse => new[]
+        {
+            new object[]
+            {
+                new [,] {{400, 150, 400}, {400, 450, 600}, {300, 225, 300}},
+                new[] {1, 0, 2},
+                new[] {1, 0, 2}
+            },
+            new object[]
+            {
+                new [,] {{10, 10, 8}, {9, 8, 1}, {9, 7, 4}},
+                new[] {0, 2, 1},
+                new[] {0, 2, 1}
+            },
+            new object[]
+            {
+                new[,]
+                {
+                    {10, int.MaxValue, int.MaxValue},
+                    {int.MaxValue, int.MaxValue, 1},
+                    {int.MaxValue, 7, int.MaxValue}
+                },
+                new[] {0, 2, 1},
+                new[] {0, 2, 1}
+            },
+            new object[]
+            {
+                new[,]
+                {
+                    {int.MaxValue, 11, int.MaxValue},
+                    {11, 1, 10},
+                    {int.MaxValue, 7, 12}
+                },
+                new[] {1, 0, 2},
+                new[] {1, 0, 2}
             }
         };
 
