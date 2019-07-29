@@ -161,8 +161,6 @@ namespace LinearAssignment
         {
             var nr = cost.NumRows;
             var nc = cost.NumColumns;
-            if (nr != nc)
-                throw new NotImplementedException("Sparse implementation works only for square matrices");
             var v = new double[nc];
             var x = Enumerable.Repeat(-1, nr).ToArray();
             var y = Enumerable.Repeat(-1, nc).ToArray();
@@ -176,124 +174,135 @@ namespace LinearAssignment
             var first = cost.IA;
             var kk = cost.CA;
             var cc = cost.A;
+            int l0;
 
-            for (var jp = 0; jp < nc; jp++)
-                v[jp] = double.PositiveInfinity;
-            for (var i = 0; i < nr; i++)
+            // The initialization steps of LAPJVsp only make sense for square matrices
+            if (nr == nc)
             {
-                for (var t = first[i]; t < first[i + 1]; t++)
+                for (var jp = 0; jp < nc; jp++)
+                    v[jp] = double.PositiveInfinity;
+                for (var i = 0; i < nr; i++)
                 {
-                    var jp = kk[t];
-                    if (cc[t] < v[jp])
-                    {
-                        v[jp] = cc[t];
-                        y[jp] = i;
-                    }
-                }
-            }
-
-            for (var jp = nc - 1; jp >= 0; jp--)
-            {
-                var i = y[jp];
-                if (x[i] == -1) x[i] = jp;
-                else
-                {
-                    y[jp] = -1;
-                    // Here, the original Pascal code simply inverts the sign of x; as that
-                    // doesn't play too well with zero-indexing, we explicitly keep track of
-                    // uniqueness instead.
-                    xinv[i] = true;
-                }
-            }
-
-            var lp = 0;
-            for (var i = 0; i < nr; i++)
-            {
-                if (xinv[i]) continue;
-                if (x[i] != -1)
-                {
-                    var min = double.PositiveInfinity;
-                    var j1 = x[i];
                     for (var t = first[i]; t < first[i + 1]; t++)
                     {
                         var jp = kk[t];
-                        if (jp != j1)
+                        if (cc[t] < v[jp])
                         {
-                            if (cc[t] - v[jp] < min)
-                            {
-                                min = cc[t] - v[jp];
-                            }
+                            v[jp] = cc[t];
+                            y[jp] = i;
                         }
                     }
-
-                    u[i] = min;
-                    var tp = first[i];
-                    while (kk[tp] != j1) tp++;
-                    v[j1] = cc[tp] - min;
                 }
-                else
+
+                for (var jp = nc - 1; jp >= 0; jp--)
                 {
-                    free[lp++] = i;
+                    var i = y[jp];
+                    if (x[i] == -1) x[i] = jp;
+                    else
+                    {
+                        y[jp] = -1;
+                        // Here, the original Pascal code simply inverts the sign of x; as that
+                        // doesn't play too well with zero-indexing, we explicitly keep track of
+                        // uniqueness instead.
+                        xinv[i] = true;
+                    }
                 }
-            }
 
-            var j0p = -1;
-            var j1p = -1;
-            for (var tel = 0; tel < 2; tel++)
+                var lp = 0;
+                for (var i = 0; i < nr; i++)
+                {
+                    if (xinv[i]) continue;
+                    if (x[i] != -1)
+                    {
+                        var min = double.PositiveInfinity;
+                        var j1 = x[i];
+                        for (var t = first[i]; t < first[i + 1]; t++)
+                        {
+                            var jp = kk[t];
+                            if (jp != j1)
+                            {
+                                if (cc[t] - v[jp] < min)
+                                {
+                                    min = cc[t] - v[jp];
+                                }
+                            }
+                        }
+
+                        u[i] = min;
+                        var tp = first[i];
+                        while (kk[tp] != j1) tp++;
+                        v[j1] = cc[tp] - min;
+                    }
+                    else
+                    {
+                        free[lp++] = i;
+                    }
+                }
+
+                var j0p = -1;
+                var j1p = -1;
+                for (var tel = 0; tel < 2; tel++)
+                {
+                    var h = 0;
+                    var l0p = lp;
+                    lp = 0;
+                    while (h < l0p)
+                    {
+                        var i = free[h++];
+                        var v0 = double.PositiveInfinity;
+                        var vj = double.PositiveInfinity;
+                        for (var t = first[i]; t < first[i + 1]; t++)
+                        {
+                            var jp = kk[t];
+                            var dj = cc[t] - v[jp];
+                            if (dj < vj)
+                            {
+                                if (dj >= v0)
+                                {
+                                    vj = dj;
+                                    j1p = jp;
+                                }
+                                else
+                                {
+                                    vj = v0;
+                                    v0 = dj;
+                                    j1p = j0p;
+                                    j0p = jp;
+                                }
+                            }
+                        }
+
+                        var i0 = y[j0p];
+                        u[i] = vj;
+                        if (v0 < vj)
+                        {
+                            v[j0p] += v0 - vj;
+                        }
+                        else if (i0 != -1)
+                        {
+                            j0p = j1p;
+                            i0 = y[j0p];
+                        }
+
+                        x[i] = j0p;
+                        y[j0p] = i;
+                        if (i0 != -1)
+                        {
+                            if (v0 < vj) free[--h] = i0;
+                            else free[lp++] = i0;
+                        }
+                    }
+                }
+
+                l0 = lp;
+            }
+            else
             {
-                var h = 0;
-                var l0p = lp;
-                lp = 0;
-                while (h < l0p)
-                {
-                    var i = free[h++];
-                    var v0 = double.PositiveInfinity;
-                    var vj = double.PositiveInfinity;
-                    for (var t = first[i]; t < first[i + 1]; t++)
-                    {
-                        var jp = kk[t];
-                        var dj = cc[t] - v[jp];
-                        if (dj < vj)
-                        {
-                            if (dj >= v0)
-                            {
-                                vj = dj;
-                                j1p = jp;
-                            }
-                            else
-                            {
-                                vj = v0;
-                                v0 = dj;
-                                j1p = j0p;
-                                j0p = jp;
-                            }
-                        }
-                    }
-
-                    var i0 = y[j0p];
-                    u[i] = vj;
-                    if (v0 < vj)
-                    {
-                        v[j0p] += v0 - vj;
-                    }
-                    else if (i0 != -1)
-                    {
-                        j0p = j1p;
-                        i0 = y[j0p];
-                    }
-
-                    x[i] = j0p;
-                    y[j0p] = i;
-                    if (i0 != -1)
-                    {
-                        if (v0 < vj) free[--h] = i0;
-                        else free[lp++] = i0;
-                    }
-                }
+                l0 = nr;
+                for (int i = 0; i < nr; i++) free[i] = i;
             }
-
             var td1 = -1;
-            var l0 = lp;
+
             for (var l = 0; l < l0; l++)
             {
                 for (var jp = 0; jp < nc; jp++)
