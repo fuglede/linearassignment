@@ -149,5 +149,35 @@ namespace LinearAssignment.Tests
             var solver = new ShortestPathSolver();
             Assert.Throws<InvalidOperationException>(() => solver.Solve(cost));
         }
+
+        [Fact]
+        public void SparseAndDenseSolversGiveSameResult()
+        {
+            var rng = new Random(42);
+            const int numberOfRuns = 100;
+            const int numRows = 400;
+            const int numCols = 600;
+
+            for (var run = 0; run < numberOfRuns; run++)
+            {
+                var dense = new double[numRows, numCols];
+                for (var i = 0; i < numRows; i++)
+                for (var j = 0; j < numCols; j++)
+                    dense[i, j] = rng.NextDouble();
+
+                var sparse = new SparseMatrixDouble(dense);
+
+                var solver = new ShortestPathSolver();
+                var denseResult = solver.Solve(dense);
+                var sparseResult = solver.Solve(sparse);
+                // Check that all assignments agree. In principle, they don't have to if more than
+                // one optimal solution exists, but this is somewhat unlikely when we're dealing
+                // with random doubles.
+                for (var i = 0; i < numRows; i++)
+                    Assert.Equal(denseResult.ColumnAssignment[i], sparseResult.ColumnAssignment[i]);
+                for (var j = 0; j < numCols; j++)
+                    Assert.Equal(denseResult.RowAssignment[j], sparseResult.RowAssignment[j]);
+            }
+        }
     }
 }
