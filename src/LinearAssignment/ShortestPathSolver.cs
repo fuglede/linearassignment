@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LinearAssignment
@@ -305,118 +306,144 @@ namespace LinearAssignment
 
             for (var l = 0; l < l0; l++)
             {
-                for (var jp = 0; jp < nc; jp++)
-                {
-                    d[jp] = double.PositiveInfinity;
-                    ok[jp] = false;
-                }
-
-                var min = double.PositiveInfinity;
-                var i0 = free[l];
-                int j;
-                for (var t = first[i0]; t < first[i0 + 1]; t++)
-                {
-                    j = kk[t];
-                    var dj = cc[t] - v[j];
-                    d[j] = dj;
-                    lab[j] = i0;
-                    if (dj <= min)
-                    {
-                        if (dj < min)
-                        {
-                            td1 = -1;
-                            min = dj;
-                        }
-
-                        todo[++td1] = j;
-                    }
-                }
-
-                for (var hp = 0; hp <= td1; hp++)
-                {
-                    j = todo[hp];
-                    if (y[j] == -1)
-                        goto label2;
-                    ok[j] = true;
-                }
-
-                var td2 = nc - 1;
-                var last = nc;
-                while (true)
-                {
-                    var j0 = todo[td1--];
-                    var i = y[j0];
-                    todo[td2--] = j0;
-                    var tp = first[i];
-                    while (kk[tp] != j0) tp++;
-                    var h = cc[tp] - v[j0] - min;
-                    for (var t = first[i]; t < first[i + 1]; t++)
-                    {
-                        j = kk[t];
-                        if (!ok[j])
-                        {
-                            var vj = cc[t] - v[j] - h;
-                            if (vj < d[j])
-                            {
-                                d[j] = vj;
-                                lab[j] = i;
-                                if (vj == min)
-                                {
-                                    if (y[j] == -1) goto label1;
-                                    todo[++td1] = j;
-                                    ok[j] = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if (td1 == -1)
-                    {
-                        // The original Pascal code uses finite numbers instead of double.PositiveInfinity
-                        // so we need to adjust slightly here.
-                        min = double.PositiveInfinity;
-                        last = td2 + 1;
-                        for (var jp = 0; jp < nc; jp++)
-                        {
-                            if (!double.IsPositiveInfinity(d[jp]) && d[jp] <= min && !ok[jp])
-                            {
-                                if (d[jp] < min)
-                                {
-                                    td1 = -1;
-                                    min = d[jp];
-                                }
-
-                                todo[++td1] = jp;
-                            }
-                        }
-
-                        for (var hp = 0; hp <= td1; hp++)
-                        {
-                            j = todo[hp];
-                            if (y[j] == -1) goto label1;
-                            ok[j] = true;
-                        }
-                    }
-                }
-                label1:
-                for (var k = last; k < nc; k++)
-                {
-                    var j0 = todo[k];
-                    v[j0] += d[j0] - min;
-                }
-                label2:
-                while (true)
-                {
-                    var i = lab[j];
-                    y[j] = i;
-                    var k = j;
-                    j = x[i];
-                    x[i] = k;
-                    if (i == i0)
-                        break;
-                }
+                SolveForOneL(l, nc, d, ok, free, first, kk, cc, v, lab, td1, todo, y, x);
             }
             return new Assignment(x, y);
+        }
+
+        private void SolveForOneL(int l, int nc, double[] d, bool[] ok, int[] free,
+            List<int> first, List<int> kk,
+            List<double> cc, double[] v, int[] lab, int td1, int[] todo, int[] y, int[] x)
+        {
+            for (var jp = 0; jp < nc; jp++)
+            {
+                d[jp] = double.PositiveInfinity;
+                ok[jp] = false;
+            }
+
+            var min = double.PositiveInfinity;
+            var i0 = free[l];
+            int j;
+            for (var t = first[i0]; t < first[i0 + 1]; t++)
+            {
+                j = kk[t];
+                var dj = cc[t] - v[j];
+                d[j] = dj;
+                lab[j] = i0;
+                if (dj <= min)
+                {
+                    if (dj < min)
+                    {
+                        td1 = -1;
+                        min = dj;
+                    }
+
+                    todo[++td1] = j;
+                }
+            }
+
+            for (var hp = 0; hp <= td1; hp++)
+            {
+                j = todo[hp];
+                if (y[j] == -1)
+                {
+                    UpdateAssignments(lab, y, x, j, i0);
+                    return;
+                }
+                ok[j] = true;
+            }
+
+            var td2 = nc - 1;
+            var last = nc;
+            while (true)
+            {
+                var j0 = todo[td1--];
+                var i = y[j0];
+                todo[td2--] = j0;
+                var tp = first[i];
+                while (kk[tp] != j0) tp++;
+                var h = cc[tp] - v[j0] - min;
+                for (var t = first[i]; t < first[i + 1]; t++)
+                {
+                    j = kk[t];
+                    if (!ok[j])
+                    {
+                        var vj = cc[t] - v[j] - h;
+                        if (vj < d[j])
+                        {
+                            d[j] = vj;
+                            lab[j] = i;
+                            if (vj == min)
+                            {
+                                if (y[j] == -1)
+                                {
+                                    UpdateDual(nc, d, v, todo, last, min);
+                                    UpdateAssignments(lab, y, x, j, i0);
+                                    return;
+                                }
+                                todo[++td1] = j;
+                                ok[j] = true;
+                            }
+                        }
+                    }
+                }
+
+                if (td1 == -1)
+                {
+                    // The original Pascal code uses finite numbers instead of double.PositiveInfinity
+                    // so we need to adjust slightly here.
+                    min = double.PositiveInfinity;
+                    last = td2 + 1;
+                    for (var jp = 0; jp < nc; jp++)
+                    {
+                        if (!double.IsPositiveInfinity(d[jp]) && d[jp] <= min && !ok[jp])
+                        {
+                            if (d[jp] < min)
+                            {
+                                td1 = -1;
+                                min = d[jp];
+                            }
+
+                            todo[++td1] = jp;
+                        }
+                    }
+
+                    for (var hp = 0; hp <= td1; hp++)
+                    {
+                        j = todo[hp];
+                        if (y[j] == -1)
+                        {
+                            UpdateDual(nc, d, v, todo, last, min);
+                            UpdateAssignments(lab, y, x, j, i0);
+                            return;
+                        }
+                        ok[j] = true;
+                    }
+                }
+            }
+        }
+
+        private static void UpdateDual(int nc, double[] d, double[] v, int[] todo, int last, double min)
+        {
+            for (var k = last; k < nc; k++)
+            {
+                var j0 = todo[k];
+                v[j0] += d[j0] - min;
+            }
+        }
+
+        private static void UpdateAssignments(int[] lab, int[] y, int[] x, int j, int i0)
+        {
+            while (true)
+            {
+                var i = lab[j];
+                y[j] = i;
+                var k = j;
+                j = x[i];
+                x[i] = k;
+                if (i == i0)
+                    break;
+            }
         }
     }
 }
