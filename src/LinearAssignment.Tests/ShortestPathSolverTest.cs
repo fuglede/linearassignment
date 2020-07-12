@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace LinearAssignment.Tests
@@ -154,16 +155,16 @@ namespace LinearAssignment.Tests
         public void SparseAndDenseSolversGiveSameResult()
         {
             var rng = new Random(42);
-            const int numberOfRuns = 100;
+            const int numberOfRuns = 500;
             const int numRows = 400;
-            const int numCols = 600;
+            const int numCols = 400;
 
             for (var run = 0; run < numberOfRuns; run++)
             {
                 var dense = new double[numRows, numCols];
                 for (var i = 0; i < numRows; i++)
                 for (var j = 0; j < numCols; j++)
-                    dense[i, j] = rng.NextDouble();
+                    dense[i, j] = rng.Next(1, 100);
 
                 var sparse = new SparseMatrixDouble(dense);
 
@@ -173,10 +174,9 @@ namespace LinearAssignment.Tests
                 // Check that all assignments agree. In principle, they don't have to if more than
                 // one optimal solution exists, but this is somewhat unlikely when we're dealing
                 // with random doubles.
-                for (var i = 0; i < numRows; i++)
-                    Assert.Equal(denseResult.ColumnAssignment[i], sparseResult.ColumnAssignment[i]);
-                for (var j = 0; j < numCols; j++)
-                    Assert.Equal(denseResult.RowAssignment[j], sparseResult.RowAssignment[j]);
+                var denseObjective = Enumerable.Range(0, numRows).Sum(i => dense[i, denseResult.ColumnAssignment[i]]);
+                var sparseObjective = Enumerable.Range(0, numRows).Sum(i => dense[i, sparseResult.ColumnAssignment[i]]);
+                Assert.Equal(denseObjective, sparseObjective);
             }
         }
     }
