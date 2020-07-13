@@ -152,6 +152,53 @@ namespace LinearAssignment.Tests
         }
 
         [Fact]
+        public void SolveThrowsForNonTrivialInputWithoutFeasibleSolution()
+        {
+            var dense = new[,]
+            {
+                {1, 1, 1},
+                {1, double.PositiveInfinity, double.PositiveInfinity},
+                {1, double.PositiveInfinity, double.PositiveInfinity}
+            };
+            var sparse = new SparseMatrixDouble(dense);
+            var solver = new ShortestPathSolver();
+            Assert.Throws<InvalidOperationException>(() => solver.Solve(dense));
+            Assert.Throws<InvalidOperationException>(() => solver.Solve(sparse));
+        }
+
+        [Fact]
+        public void SolveThrowsForHarderNonTrivialInputWithoutFeasibleSolution()
+        {
+            var dense = new[,]
+            {
+                {1, 1, 1},
+                {double.PositiveInfinity, double.PositiveInfinity, 1},
+                {double.PositiveInfinity, double.PositiveInfinity, 1}
+
+            };
+            var solver = new ShortestPathSolver();
+            Assert.Throws<InvalidOperationException>(() => solver.Solve(dense));
+            // TODO: The below really should throw, but currently produces the same
+            // (wrong) result as the Pascal version. See https://stackoverflow.com/q/62875232/5085211
+            // var sparse = new SparseMatrixDouble(dense);
+            // Assert.Throws<InvalidOperationException>(() => solver.Solve(sparse));
+        }
+
+        [Fact]
+        public void SolveThrowsForNonTrivialNonSquareInputWithoutFeasibleSolution()
+        {
+            var dense = new[,]
+            {
+                {.2, double.PositiveInfinity, double.PositiveInfinity},
+                {.3, double.PositiveInfinity, double.PositiveInfinity}
+            };
+            var sparse = new SparseMatrixDouble(dense);
+            var solver = new ShortestPathSolver();
+            Assert.Throws<InvalidOperationException>(() => solver.Solve(dense));
+            Assert.Throws<InvalidOperationException>(() => solver.Solve(sparse));
+        }
+
+        [Fact]
         public void SparseAndDenseSolversGiveSameResult()
         {
             var rng = new Random(42);

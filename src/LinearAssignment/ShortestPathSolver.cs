@@ -282,6 +282,8 @@ namespace LinearAssignment
                         else if (i0 != -1)
                         {
                             j0p = j1p;
+                            if (j0p < 0)
+                                throw new InvalidOperationException("No feasible solution.");
                             i0 = y[j0p];
                         }
 
@@ -357,6 +359,8 @@ namespace LinearAssignment
             var last = nc;
             while (true)
             {
+                if (td1 < 0)
+                    throw new InvalidOperationException("No feasible solution.");
                 var j0 = todo[td1--];
                 var i = y[j0];
                 todo[td2--] = j0;
