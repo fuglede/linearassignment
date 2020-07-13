@@ -304,18 +304,18 @@ namespace LinearAssignment
                 l0 = nr;
                 for (int i = 0; i < nr; i++) free[i] = i;
             }
-            var td1 = -1;
 
+            var td1 = -1;
             for (var l = 0; l < l0; l++)
             {
-                SolveForOneL(l, nc, d, ok, free, first, kk, cc, v, lab, td1, todo, y, x);
+                td1 = SolveForOneL(l, nc, d, ok, free, first, kk, cc, v, lab, todo, y, x, td1);
             }
             return new Assignment(x, y);
         }
 
-        private void SolveForOneL(int l, int nc, double[] d, bool[] ok, int[] free,
+        private int SolveForOneL(int l, int nc, double[] d, bool[] ok, int[] free,
             List<int> first, List<int> kk,
-            List<double> cc, double[] v, int[] lab, int td1, int[] todo, int[] y, int[] x)
+            List<double> cc, double[] v, int[] lab, int[] todo, int[] y, int[] x, int td1)
         {
             for (var jp = 0; jp < nc; jp++)
             {
@@ -350,7 +350,7 @@ namespace LinearAssignment
                 if (y[j] == -1)
                 {
                     UpdateAssignments(lab, y, x, j, i0);
-                    return;
+                    return td1;
                 }
                 ok[j] = true;
             }
@@ -383,7 +383,7 @@ namespace LinearAssignment
                                 {
                                     UpdateDual(nc, d, v, todo, last, min);
                                     UpdateAssignments(lab, y, x, j, i0);
-                                    return;
+                                    return td1;
                                 }
                                 todo[++td1] = j;
                                 ok[j] = true;
@@ -419,7 +419,7 @@ namespace LinearAssignment
                         {
                             UpdateDual(nc, d, v, todo, last, min);
                             UpdateAssignments(lab, y, x, j, i0);
-                            return;
+                            return td1;
                         }
                         ok[j] = true;
                     }
