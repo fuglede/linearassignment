@@ -446,7 +446,7 @@ namespace LinearAssignment
                 j = x[i];
                 x[i] = k;
                 if (i == i0)
-                    break;
+                    return;
             }
         }
     }
