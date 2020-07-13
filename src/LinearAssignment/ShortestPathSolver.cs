@@ -240,8 +240,6 @@ namespace LinearAssignment
                     }
                 }
 
-                var j0p = -1;
-                var j1p = -1;
                 for (var tel = 0; tel < 2; tel++)
                 {
                     var h = 0;
@@ -249,7 +247,12 @@ namespace LinearAssignment
                     lp = 0;
                     while (h < l0p)
                     {
+                        // Note: In the original Pascal code, the indices of the lowest
+                        // and second-lowest reduced costs are never reset. This can
+                        // cause issues for infeasible problems; see https://stackoverflow.com/q/62875232/5085211
                         var i = free[h++];
+                        var j0p = -1;
+                        var j1p = -1;
                         var v0 = double.PositiveInfinity;
                         var vj = double.PositiveInfinity;
                         for (var t = first[i]; t < first[i + 1]; t++)
@@ -273,6 +276,10 @@ namespace LinearAssignment
                             }
                         }
 
+                        // If the index of the column with the largest reduced cost has not been
+                        // set, no assignment is possible for this row.
+                        if (j0p < 0)
+                            throw new InvalidOperationException("No feasible solution.");
                         var i0 = y[j0p];
                         u[i] = vj;
                         if (v0 < vj)
@@ -282,8 +289,6 @@ namespace LinearAssignment
                         else if (i0 != -1)
                         {
                             j0p = j1p;
-                            if (j0p < 0)
-                                throw new InvalidOperationException("No feasible solution.");
                             i0 = y[j0p];
                         }
 

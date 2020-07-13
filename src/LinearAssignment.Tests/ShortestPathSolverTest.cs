@@ -176,12 +176,10 @@ namespace LinearAssignment.Tests
                 {double.PositiveInfinity, double.PositiveInfinity, 1}
 
             };
+            var sparse = new SparseMatrixDouble(dense);
             var solver = new ShortestPathSolver();
             Assert.Throws<InvalidOperationException>(() => solver.Solve(dense));
-            // TODO: The below really should throw, but currently produces the same
-            // (wrong) result as the Pascal version. See https://stackoverflow.com/q/62875232/5085211
-            // var sparse = new SparseMatrixDouble(dense);
-            // Assert.Throws<InvalidOperationException>(() => solver.Solve(sparse));
+            Assert.Throws<InvalidOperationException>(() => solver.Solve(sparse));
         }
 
         [Fact]
