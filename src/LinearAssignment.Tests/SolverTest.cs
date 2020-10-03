@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace LinearAssignment.Tests
@@ -36,7 +37,7 @@ namespace LinearAssignment.Tests
             },
             new object[]
             {
-                new double[,] {{6, 5, 5}, {6, 4, 3}, {4, -3, 0}, {7, -3 , 6}},
+                new double[,] {{6, 5, 5}, {6, 4, 3}, {4, -3, 0}, {7, -3, 6}},
                 new[] {-1, 0, 2, 1},
                 new[] {1, 3, 2},
                 new double[] {0, 0, -2, 0},
@@ -56,6 +57,30 @@ namespace LinearAssignment.Tests
                 new double[] {0, 0, 0}
             }
         };
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void SolveLeavesCostInputUnchanged(bool maximize)
+        {
+            var cost = new double[,] { { 6, 6, 4, 7 }, { 5, 4, -3, -3 }, { 5, 3, 0, 6 } };
+            var costCopy = cost.Clone() as double[,];
+            Solver.Solve(cost, maximize);
+            Assert.All(Enumerable.Range(0, cost.GetLength(0)),
+                i => Assert.All(Enumerable.Range(0, cost.GetLength(1)), j => Assert.Equal(costCopy[i, j], cost[i, j])));
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void SolveLeavesCostInputUnchangedAfterTransposing(bool maximize)
+        {
+            var cost = new double[,] { { 6, 5, 5 }, { 6, 4, 3 }, { 4, -3, 0 }, { 7, -3, 6 } };
+            var costCopy = cost.Clone() as double[,];
+            Solver.Solve(cost, maximize);
+            Assert.All(Enumerable.Range(0, cost.GetLength(0)),
+                i => Assert.All(Enumerable.Range(0, cost.GetLength(1)), j => Assert.Equal(costCopy[i, j], cost[i, j])));
+        }
 
         [Theory]
         [MemberData(nameof(TestDataMaximize))]

@@ -20,10 +20,14 @@ namespace LinearAssignment
         /// when minimizing and <see cref="double.NegativeInfinity"/> when maximizing.</param>
         /// <param name="maximize">Whether or not to maximize total cost rather than minimize it.</param>
         /// <param name="solver">The solver to use. If not given, this defaults to <see cref="ShortestPathSolver"/>.</param>
+        /// <param name="allowOverwrite">Allows the entries <paramref name="cost"/> to be changed; setting this to
+        /// <see langword="true" /> can give performance improvements in certain cases.</param>
         /// <returns>An <see cref="Assignment"/> representing the solution.</returns>
-        public static Assignment Solve(double[,] cost, bool maximize = false, ISolver solver = null)
+        public static Assignment Solve(double[,] cost, bool maximize = false,
+            ISolver solver = null, bool allowOverwrite = false)
         {
             var transpose = Transpose(ref cost);
+            allowOverwrite = transpose || allowOverwrite;
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
             if (nr == 0 || nc == 0) return AssignmentWithDuals.Empty;
@@ -33,11 +37,21 @@ namespace LinearAssignment
             // update the dual variables accordingly.
             if (maximize)
             {
-                var tmpCost = new double[nr, nc];
-                for (var i = 0; i < nr; i++)
-                for (var j = 0; j < nc; j++)
-                    tmpCost[i, j] = -cost[i, j];
-                cost = tmpCost;
+                if (allowOverwrite)
+                {
+                    for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        cost[i, j] = -cost[i, j];
+                }
+                else
+                {
+                    var tmpCost = new double[nr, nc];
+                    for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        tmpCost[i, j] = -cost[i, j];
+                    cost = tmpCost;
+                    allowOverwrite = true;
+                }
             }
 
             // Ensure that all values are positive
@@ -48,9 +62,22 @@ namespace LinearAssignment
                     min = cost[i, j];
 
             if (min < 0)
-                for (var i = 0; i < nr; i++)
-                for (var j = 0; j < nc; j++)
-                    cost[i, j] -= min;
+            {
+                if (allowOverwrite)
+                {
+                    for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        cost[i, j] -= min;
+                }
+                else
+                {
+                    var tmpCost = new double[nr, nc];
+                    for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        tmpCost[i, j] = cost[i, j] - min;
+                    cost = tmpCost;
+                }
+            }
             else
                 min = 0;
 
@@ -79,10 +106,14 @@ namespace LinearAssignment
         /// <param name="maximize">Whether or not to maximize total cost rather than minimize it.</param>
         /// <param name="solver">The solver to use. If not given, this defaults to <see cref="PseudoflowSolver"/>
         /// for square costs and <see cref="ShortestPathSolver"/> for rectangular ones.</param>
+        /// <param name="allowOverwrite">Allows the entries <paramref name="cost"/> to be changed; setting this to
+        /// <see langword="true" /> can give performance improvements in certain cases.</param>
         /// <returns>An <see cref="Assignment"/> representing the solution.</returns>
-        public static Assignment Solve(int[,] cost, bool maximize = false, ISolver solver = null)
+        public static Assignment Solve(int[,] cost, bool maximize = false,
+            ISolver solver = null, bool allowOverwrite = false)
         {
             var transpose = Transpose(ref cost);
+            allowOverwrite = transpose || allowOverwrite;
             var nr = cost.GetLength(0);
             var nc = cost.GetLength(1);
             if (nr == 0 || nc == 0) return AssignmentWithDuals.Empty;
@@ -91,11 +122,21 @@ namespace LinearAssignment
             // to take special care when dealing with "infinities".
             if (maximize)
             {
-                var tmpCost = new int[nr, nc];
-                for (var i = 0; i < nr; i++)
-                for (var j = 0; j < nc; j++)
-                    tmpCost[i, j] = cost[i, j] == int.MinValue ? int.MaxValue : -cost[i, j];
-                cost = tmpCost;
+                if (allowOverwrite)
+                {
+                    for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        cost[i, j] = cost[i, j] == int.MinValue ? int.MaxValue : -cost[i, j];
+                }
+                else
+                {
+                    var tmpCost = new int[nr, nc];
+                    for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        tmpCost[i, j] = cost[i, j] == int.MinValue ? int.MaxValue : -cost[i, j];
+                    cost = tmpCost;
+                    allowOverwrite = true;
+                }
             }
 
             // Ensure that all values are positive
@@ -106,11 +147,26 @@ namespace LinearAssignment
                     min = cost[i, j];
 
             if (min < 0)
-                for (var i = 0; i < nr; i++)
-                for (var j = 0; j < nc; j++)
-                    cost[i, j] = cost[i, j] == int.MaxValue ? int.MaxValue : cost[i, j] - min;
+            {
+                if (allowOverwrite)
+                {
+                    for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        cost[i, j] = cost[i, j] == int.MaxValue ? int.MaxValue : cost[i, j] - min;
+                }
+                else
+                {
+                    var tmpCost = new int[nr, nc];
+                    for (var i = 0; i < nr; i++)
+                    for (var j = 0; j < nc; j++)
+                        tmpCost[i, j] = cost[i, j] == int.MaxValue ? int.MaxValue : cost[i, j] - min;
+                    cost = tmpCost;
+                }
+            }
             else
+            {
                 min = 0;
+            }
 
             if (solver == null)
                 solver = nr == nc ? (ISolver) new PseudoflowSolver() : new ShortestPathSolver();
