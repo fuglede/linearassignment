@@ -19,10 +19,13 @@ namespace LinearAssignment
         }
 
         public SparseMatrixDouble(SparseMatrixInt sparse) :
-            this(sparse.A.ConvertAll(x => (double)x), sparse.IA, sparse.CA, sparse.NumColumns)
+            this(sparse.A.ConvertAll(x => (double)x), new List<int>(sparse.IA), new List<int>(sparse.CA), sparse.NumColumns)
         {
             _max = sparse.MaxValue;
         }
+
+        public SparseMatrixDouble(SparseMatrixDouble matrix) :
+            this(new List<double>(matrix.A), new List<int>(matrix.IA), new List<int>(matrix.CA), matrix.NumColumns) {}
 
         public SparseMatrixDouble(double[,] dense, double empty = double.PositiveInfinity)
         {

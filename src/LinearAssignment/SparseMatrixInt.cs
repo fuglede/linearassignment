@@ -18,6 +18,10 @@ namespace LinearAssignment
             NumColumns = numColumns;
         }
 
+        public SparseMatrixInt(SparseMatrixInt matrix) :
+            this(new List<int>(matrix.A), new List<int>(matrix.IA), new List<int>(matrix.CA), matrix.NumColumns)
+        { }
+
         public SparseMatrixInt(int[,] dense, int empty = int.MaxValue)
         {
             A = new List<int>();
