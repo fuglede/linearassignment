@@ -48,6 +48,39 @@ namespace LinearAssignment
             NumColumns = nc;
         }
 
+        public SparseMatrixInt Transpose()
+        {
+            var n = A.Count;
+            var newA = new int[n];
+            var newIA = new int[NumColumns + 1];
+            var newCA = new int[n];
+
+            for (int i = 0; i < n; i++) newIA[CA[i] + 1]++;
+
+            for (int i = 2; i < NumColumns + 1; i++) newIA[i] += newIA[i - 1];
+
+            for (var i = 0; i < NumRows; i++)
+            {
+                for (var j = IA[i]; j < IA[i + 1]; j++)
+                {
+                    var col = CA[j];
+                    var dest = newIA[col];
+                    newCA[dest] = i;
+                    newA[dest] = A[j];
+                    newIA[col]++;
+                }
+            }
+
+            for (int i = 0, last = 0; i < NumColumns + 1; i++)
+            {
+                var tmp = newIA[i];
+                newIA[i] = last;
+                last = tmp;
+            }
+
+            return new SparseMatrixInt(newA.ToList(), newIA.ToList(), newCA.ToList(), NumRows);
+        }
+
         private int _max = int.MinValue;
         public int MaxValue => _max != int.MinValue ? _max : _max = A.Max();
         public List<int> A { get; }
