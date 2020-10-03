@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -266,5 +267,44 @@ namespace LinearAssignment.Tests
                 new[] {0, 2, 1}
             }
         };
+
+        [Fact]
+        public void SparseAndDenseSolversGiveSameResult()
+        {
+            var rng = new Random(60);
+            const int numberOfRuns = 1000;
+
+            for (var run = 0; run < numberOfRuns; run++)
+            {
+                var numRows = rng.Next(200, 300);
+                var numCols = rng.Next(200, 300);
+                var dense = new double[numRows, numCols];
+                for (var i = 0; i < numRows; i++)
+                for (var j = 0; j < numCols; j++)
+                    dense[i, j] = rng.NextDouble() < 0.3 ? double.PositiveInfinity : rng.Next(1, 100);
+                var sparse = new SparseMatrixDouble(dense);
+
+                var denseResult = Solver.Solve(dense);
+                var sparseResult = Solver.Solve(sparse);
+
+                // Check that the objective agrees for both solvers.
+                if (numRows <= numCols)
+                {
+                    var denseObjective =
+                        Enumerable.Range(0, numRows).Sum(i => dense[i, denseResult.ColumnAssignment[i]]);
+                    var sparseObjective =
+                        Enumerable.Range(0, numRows).Sum(i => dense[i, sparseResult.ColumnAssignment[i]]);
+                    Assert.Equal(denseObjective, sparseObjective);
+                }
+                else
+                {
+                    var denseObjective =
+                        Enumerable.Range(0, numCols).Sum(i => dense[denseResult.RowAssignment[i], i]);
+                    var sparseObjective =
+                        Enumerable.Range(0, numCols).Sum(i => dense[sparseResult.RowAssignment[i], i]);
+                    Assert.Equal(denseObjective, sparseObjective);
+                }
+            }
+        }
     }
 }

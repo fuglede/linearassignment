@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace LinearAssignment
 {
@@ -206,6 +207,90 @@ namespace LinearAssignment
         {
             for (var i = 0; i < u.Count; i++) u[i] = -u[i];
             for (var j = 0; j < v.Count; j++) v[j] = -v[j];
+        }
+
+        /// <summary>
+        /// Solves a sparse instance of the linear assignment problem with floating point costs.
+        /// </summary>
+        /// <param name="cost">The weights of the edges of the bipartite graph representing the problem.</param>
+        /// <param name="maximize">Whether or not to maximize total cost rather than minimize it.</param>
+        /// <param name="solver">The solver to use. If not given, this defaults to <see cref="ShortestPathSolver"/>.</param>
+        /// <param name="allowOverwrite">Allows the entries <paramref name="cost"/> to be changed; setting this to
+        /// <see langword="true" /> can give performance improvements in certain cases.</param>
+        /// <returns>An <see cref="Assignment"/> representing the solution.</returns>
+        public static Assignment Solve(SparseMatrixDouble cost, bool maximize = false,
+            ISolver solver = null, bool allowOverwrite = false)
+        {
+            bool transpose = false;
+            if (cost.NumRows > cost.NumColumns)
+            {
+                cost = cost.Transpose();
+                allowOverwrite = true;
+                transpose = true;
+            }
+            var nr = cost.NumRows;
+            var nc = cost.NumColumns;
+            if (nr == 0 || nc == 0) return AssignmentWithDuals.Empty;
+
+            // We handle maximization by changing all signs in the given cost, then
+            // minimizing the result. At the end of the day, we also make sure to
+            // update the dual variables accordingly.
+            if (maximize)
+            {
+                if (!allowOverwrite)
+                {
+                    cost = new SparseMatrixDouble(cost);
+                    allowOverwrite = true;
+                }
+                for (var i = 0; i < cost.A.Count; i++)
+                    cost.A[i] = -cost.A[i];
+            }
+
+            // Ensure that all values are positive
+            var min = cost.A.Any() ? cost.A.Min() : double.PositiveInfinity;
+
+            if (min < 0)
+            {
+                if (!allowOverwrite)
+                    cost = new SparseMatrixDouble(cost);
+
+                for (var i = 0; i < cost.A.Count; i++)
+                    cost.A[i] -= min;
+            }
+            else
+                min = 0;
+
+            if (solver == null) solver = new ShortestPathSolver();
+            var solution = solver.Solve(cost);
+
+            if (solution is AssignmentWithDuals solutionWithDuals)
+            {
+                if (min != 0)
+                    for (var ip = 0; ip < nr; ip++)
+                        solutionWithDuals.DualU[ip] += min;
+                if (maximize) FlipDualSigns(solutionWithDuals.DualU, solutionWithDuals.DualV);
+            }
+
+            if (transpose) solution = solution.Transpose();
+
+            return solution;
+        }
+
+        /// <summary>
+        /// Solves a sparse instance of the linear assignment problem with integer costs.
+        /// </summary>
+        /// <param name="cost">The weights of the edges of the bipartite graph representing the problem.</param>
+        /// <param name="maximize">Whether or not to maximize total cost rather than minimize it.</param>
+        /// <param name="solver">The solver to use. If not given, this defaults to <see cref="ShortestPathSolver"/>.</param>
+        /// <param name="allowOverwrite">Allows the entries <paramref name="cost"/> to be changed; setting this to
+        /// <see langword="true" /> can give performance improvements in certain cases.</param>
+        /// <returns>An <see cref="Assignment"/> representing the solution.</returns>
+        public static Assignment Solve(SparseMatrixInt cost, bool maximize = false,
+            ISolver solver = null, bool allowOverwrite = false)
+        {
+            // Currently, the implemented solvers just translate to the floating point
+            // equivalents, so there's no reason to distinguish here.
+            return Solve(new SparseMatrixDouble(cost), maximize, solver, true);
         }
     }
 }
