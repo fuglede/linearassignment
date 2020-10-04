@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Xunit;
 
 namespace LinearAssignment.Tests
@@ -18,6 +17,7 @@ namespace LinearAssignment.Tests
             Assert.Equal(expectedColumnAssignment, solution.ColumnAssignment);
             Assert.Equal(expectedRowAssignment, solution.RowAssignment);
         }
+
         [Theory]
         [MemberData(nameof(TestDataMinimize))]
         public void SolveSparseGivesExpectedResultWhenMinimizing(
@@ -39,13 +39,13 @@ namespace LinearAssignment.Tests
         {
             new object[]
             {
-                new int[,] {{400, 150, 400}, {400, 450, 600}, {300, 225, 300}},
+                new[,] {{400, 150, 400}, {400, 450, 600}, {300, 225, 300}},
                 new[] {1, 0, 2},
                 new[] {1, 0, 2}
             },
             new object[]
             {
-                new int[,] {{10, 10, 8}, {9, 8, 1}, {9, 7, 4}},
+                new[,] {{10, 10, 8}, {9, 8, 1}, {9, 7, 4}},
                 new[] {0, 2, 1},
                 new[] {0, 2, 1}
             },

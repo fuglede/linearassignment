@@ -82,7 +82,7 @@ namespace LinearAssignment
             else
                 min = 0;
 
-            if (solver == null) solver = new ShortestPathSolver();
+            solver ??= new ShortestPathSolver();
             var solution = solver.Solve(cost);
 
             if (solution is AssignmentWithDuals solutionWithDuals)
@@ -169,8 +169,7 @@ namespace LinearAssignment
                 min = 0;
             }
 
-            if (solver == null)
-                solver = nr == nc ? (ISolver) new PseudoflowSolver() : new ShortestPathSolver();
+            solver ??= nr == nc ? (ISolver) new PseudoflowSolver() : new ShortestPathSolver();
             var solution = solver.Solve(cost);
 
             if (solution is AssignmentWithDuals solutionWithDuals)
@@ -221,7 +220,7 @@ namespace LinearAssignment
         public static Assignment Solve(SparseMatrixDouble cost, bool maximize = false,
             ISolver solver = null, bool allowOverwrite = false)
         {
-            bool transpose = false;
+            var transpose = false;
             if (cost.NumRows > cost.NumColumns)
             {
                 cost = cost.Transpose();
@@ -260,7 +259,7 @@ namespace LinearAssignment
             else
                 min = 0;
 
-            if (solver == null) solver = new ShortestPathSolver();
+            solver ??= new ShortestPathSolver();
             var solution = solver.Solve(cost);
 
             if (solution is AssignmentWithDuals solutionWithDuals)

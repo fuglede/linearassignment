@@ -33,14 +33,14 @@ namespace LinearAssignment
             IA = new List<int>();
             CA = new List<int>();
             IA.Add(0);
-            int nonInfinite = 0;
+            var nonInfinite = 0;
             var nr = dense.GetLength(0);
             var nc = dense.GetLength(1);
-            for (int i = 0; i < nr; i++)
+            for (var i = 0; i < nr; i++)
             {
-                for (int j = 0; j < nc; j++)
+                for (var j = 0; j < nc; j++)
                 {
-                    double entry = dense[i, j];
+                    var entry = dense[i, j];
                     if (entry != empty)
                     {
                         nonInfinite++;
@@ -64,9 +64,9 @@ namespace LinearAssignment
             var newIA = new int[NumColumns + 1];
             var newCA = new int[n];
 
-            for (int i = 0; i < n; i++) newIA[CA[i] + 1]++;
+            for (var i = 0; i < n; i++) newIA[CA[i] + 1]++;
 
-            for (int i = 2; i < NumColumns + 1; i++) newIA[i] += newIA[i - 1];
+            for (var i = 2; i < NumColumns + 1; i++) newIA[i] += newIA[i - 1];
 
             for (var i = 0; i < NumRows; i++)
             {
