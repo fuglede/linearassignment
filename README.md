@@ -60,7 +60,7 @@ In addition to being able to use `double.PositiveInfinity` to represent missing 
 // Represent [[2.5, missing, -1], [1, 2, missing]]
 var cost = new SparseMatrixDouble(
     new List<double> {2.5, -1, 1, 2},
-    new List<int>{0, 2, 4},
+    new List<int> {0, 2, 4},
     new List<int> {0, 2, 0, 1},
     3);
 // Or if the input is already densely represented:
