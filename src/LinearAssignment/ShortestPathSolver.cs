@@ -58,7 +58,7 @@ namespace LinearAssignment
                 double minVal = 0;
                 var i = curRow;
                 // Reset working arrays
-                var remaining = Enumerable.Repeat(0, nc).ToList();
+                var remaining = new int[nc].ToList();
                 var numRemaining = nc;
                 for (var jp = 0; jp < nc; jp++)
                 {
