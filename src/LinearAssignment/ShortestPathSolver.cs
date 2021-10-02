@@ -43,11 +43,14 @@ namespace LinearAssignment
             var u = new double[nr];
             var v = new double[nc];
             var shortestPathCosts = new double[nc];
-            var path = Enumerable.Repeat(-1, nc).ToArray();
-            var x = Enumerable.Repeat(-1, nr).ToArray();
-            var y = Enumerable.Repeat(-1, nc).ToArray();
+            var path = new int[nc];
+            var x = new int[nr];
+            var y = new int[nc];
             var sr = new bool[nr];
             var sc = new bool[nc];
+            Array.Fill(path, -1);
+            Array.Fill(x, -1);
+            Array.Fill(y, -1);
 
             // Find a matching one vertex at a time
             for (var curRow = 0; curRow < nr; curRow++)
@@ -55,7 +58,7 @@ namespace LinearAssignment
                 double minVal = 0;
                 var i = curRow;
                 // Reset working arrays
-                var remaining = Enumerable.Repeat(0, nc).ToList();
+                var remaining = new int[nc].ToList();
                 var numRemaining = nc;
                 for (var jp = 0; jp < nc; jp++)
                 {
@@ -166,19 +169,23 @@ namespace LinearAssignment
             var nr = cost.NumRows;
             var nc = cost.NumColumns;
             var v = new double[nc];
-            var x = Enumerable.Repeat(-1, nr).ToArray();
-            var y = Enumerable.Repeat(-1, nc).ToArray();
+            var x = new int[nr];
+            var y = new int[nc];
             var u = new double[nr];
             var d = new double[nc];
             var ok = new bool[nc];
             var xinv = new bool[nr];
-            var free = Enumerable.Repeat(-1, nr).ToArray();
-            var todo = Enumerable.Repeat(-1, nc).ToArray();
+            var free = new int[nr];
+            var todo = new int[nc];
             var lab = new int[nc];
             var first = cost.IA;
             var kk = cost.CA;
             var cc = cost.A;
             int l0;
+            Array.Fill(x, -1);
+            Array.Fill(y, -1);
+            Array.Fill(free, -1);
+            Array.Fill(todo, -1);
 
             // The initialization steps of LAPJVsp only make sense for square matrices
             if (nr == nc)
