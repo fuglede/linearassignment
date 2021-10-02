@@ -77,9 +77,7 @@ namespace LinearAssignment
 
             for (int i = 0, last = 0; i < NumColumns + 1; i++)
             {
-                var tmp = newIA[i];
-                newIA[i] = last;
-                last = tmp;
+                (newIA[i], last) = (last, newIA[i]);
             }
 
             return new SparseMatrixInt(newA.ToList(), newIA.ToList(), newCA.ToList(), NumRows);

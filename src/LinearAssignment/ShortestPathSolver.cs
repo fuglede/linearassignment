@@ -127,9 +127,7 @@ namespace LinearAssignment
                 {
                     var ip = path[j];
                     y[j] = ip;
-                    var tmp = j;
-                    j = x[ip];
-                    x[ip] = tmp;
+                    (j, x[ip]) = (x[ip], j);
                     if (ip == curRow)
                         break;
                 }
@@ -450,9 +448,7 @@ namespace LinearAssignment
             {
                 var i = lab[j];
                 y[j] = i;
-                var k = j;
-                j = x[i];
-                x[i] = k;
+                (j, x[i]) = (x[i], j);
                 if (i == i0)
                     return;
             }
