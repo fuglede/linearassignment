@@ -1,3 +1,5 @@
+Note: This repository has been moved to https://codeberg.org/fuglede/linearassignment
+
 # Linear assignment problem solver in .NET
 
 [![Build status](https://travis-ci.org/fuglede/linearassignment.svg?branch=master)](https://travis-ci.org/fuglede/linearassignment)
